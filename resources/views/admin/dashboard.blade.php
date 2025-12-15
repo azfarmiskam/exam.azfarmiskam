@@ -68,8 +68,14 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="#" class="nav-link" data-page="students">
+                            <a href="#" class="nav-link" data-page="groups">
                                 <span class="nav-icon">👥</span>
+                                <span class="nav-text">Groups</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-page="students">
+                                <span class="nav-icon">🎓</span>
                                 <span class="nav-text">Students</span>
                             </a>
                         </li>
@@ -352,16 +358,10 @@
 
                 <!-- Students Content -->
                 <div class="spa-content" id="page-students">
-                    <!-- Header with Add Button -->
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-                        <div>
-                            <h2 style="margin: 0; font-size: 1.5rem; font-weight: 700;">Students</h2>
-                            <p style="margin: 0.25rem 0 0 0; color: var(--text-secondary); font-size: 0.875rem;">Manage student registrations</p>
-                        </div>
-                        <button class="btn btn-primary" onclick="openCreateStudentModal()" style="display: flex; align-items: center; gap: 0.5rem;">
-                            <span>➕</span>
-                            <span>Add Student</span>
-                        </button>
+                    <!-- Header -->
+                    <div style="margin-bottom: 1.5rem;">
+                        <h2 style="margin: 0; font-size: 1.5rem; font-weight: 700;">Exam Participants</h2>
+                        <p style="margin: 0.25rem 0 0 0; color: var(--text-secondary); font-size: 0.875rem;">View students who have registered for exams (students self-register when taking exams)</p>
                     </div>
 
                     <!-- Filters -->
@@ -409,9 +409,9 @@
                                     <tbody id="studentsTableBody">
                                         <tr>
                                             <td colspan="6" style="text-align: center; padding: 3rem; color: var(--text-secondary);">
-                                                <div style="font-size: 3rem; margin-bottom: 1rem;">👥</div>
-                                                <div style="font-size: 1.125rem; font-weight: 600; margin-bottom: 0.5rem;">No students yet</div>
-                                                <div style="font-size: 0.875rem;">Add your first student to get started</div>
+                                                <div style="font-size: 3rem; margin-bottom: 1rem;">🎓</div>
+                                                <div style="font-size: 1.125rem; font-weight: 600; margin-bottom: 0.5rem;">No exam participants yet</div>
+                                                <div style="font-size: 0.875rem;">Students will appear here after they register for exams</div>
                                             </td>
                                         </tr>
                                     </tbody>
