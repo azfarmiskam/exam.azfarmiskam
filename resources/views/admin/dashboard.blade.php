@@ -247,10 +247,63 @@
 
                 <!-- Questions Content -->
                 <div class="spa-content" id="page-questions">
-                    <div class="card">
+                    <!-- Header with Add Button -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                        <div>
+                            <h2 style="margin: 0; font-size: 1.5rem; font-weight: 700;">Question Bank</h2>
+                            <p style="margin: 0.25rem 0 0 0; color: var(--text-secondary); font-size: 0.875rem;">Manage exam questions</p>
+                        </div>
+                        <button class="btn btn-primary" onclick="openCreateQuestionModal()" style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span>➕</span>
+                            <span>Add Question</span>
+                        </button>
+                    </div>
+
+                    <!-- Filters -->
+                    <div class="card" style="margin-bottom: 1.5rem;">
                         <div class="card-body">
-                            <h3>Question Bank</h3>
-                            <p>Question bank features coming soon...</p>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr auto; gap: 1rem;">
+                                <div class="form-group" style="margin: 0;">
+                                    <label class="form-label">Category</label>
+                                    <select id="questionCategoryFilter" class="form-control" onchange="filterQuestions()">
+                                        <option value="">All Categories</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" style="margin: 0;">
+                                    <label class="form-label">Search</label>
+                                    <input type="text" id="questionSearch" class="form-control" placeholder="Search questions..." onkeyup="filterQuestions()">
+                                </div>
+                                <div style="display: flex; align-items: flex-end;">
+                                    <button class="btn btn-secondary" onclick="clearFilters()">Clear</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Questions Table -->
+                    <div class="card">
+                        <div class="card-body" style="padding: 0;">
+                            <div style="overflow-x: auto;">
+                                <table class="data-table" id="questionsTable">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 40%;">Question</th>
+                                            <th>Category</th>
+                                            <th>Answer</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="questionsTableBody">
+                                        <tr>
+                                            <td colspan="4" style="text-align: center; padding: 3rem; color: var(--text-secondary);">
+                                                <div style="font-size: 3rem; margin-bottom: 1rem;">❓</div>
+                                                <div style="font-size: 1.125rem; font-weight: 600; margin-bottom: 0.5rem;">No questions yet</div>
+                                                <div style="font-size: 0.875rem;">Add your first question to get started</div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -489,6 +542,66 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" onclick="closeCategoryModal()">Cancel</button>
                     <button type="submit" class="btn btn-primary" id="categorySaveBtn">Create Category</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Question Modal -->
+    <div class="modal" id="questionModal" style="display: none;">
+        <div class="modal-overlay" onclick="closeQuestionModal()"></div>
+        <div class="modal-content" style="max-width: 700px;">
+            <div class="modal-header">
+                <h3 id="questionModalTitle">Add Question</h3>
+                <button class="modal-close" onclick="closeQuestionModal()">×</button>
+            </div>
+            <form id="questionForm" onsubmit="saveQuestion(event)">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="form-label">Category *</label>
+                        <select name="category_id" class="form-control" required id="questionCategorySelect">
+                            <option value="">Select category</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Question *</label>
+                        <textarea name="question_text" class="form-control" rows="3" required placeholder="Enter your question"></textarea>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="form-group">
+                            <label class="form-label">Option A *</label>
+                            <input type="text" name="option_a" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Option B *</label>
+                            <input type="text" name="option_b" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Option C *</label>
+                            <input type="text" name="option_c" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Option D *</label>
+                            <input type="text" name="option_d" class="form-control" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Correct Answer *</label>
+                        <select name="correct_answer" class="form-control" required>
+                            <option value="">Select correct answer</option>
+                            <option value="a">A</option>
+                            <option value="b">B</option>
+                            <option value="c">C</option>
+                            <option value="d">D</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeQuestionModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="questionSaveBtn">Add Question</button>
                 </div>
             </form>
         </div>
@@ -1084,8 +1197,229 @@
                 if (page === 'categories') {
                     loadCategories();
                 }
+                if (page === 'questions') {
+                    loadQuestions();
+                    populateCategorySelects();
+                }
             });
         });
+
+        // ==========================================
+        // QUESTION MANAGEMENT
+        // ==========================================
+        
+        let questions = [];
+        let allQuestions = [];
+        let editingQuestionId = null;
+
+        // Load questions
+        async function loadQuestions() {
+            try {
+                const response = await fetch('/admin/api/questions', {
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    }
+                });
+                const data = await response.json();
+                allQuestions = data.questions;
+                questions = allQuestions;
+                renderQuestions();
+            } catch (error) {
+                console.error('Error loading questions:', error);
+                showNotification('Error loading questions', 'error');
+            }
+        }
+
+        // Render questions table
+        function renderQuestions() {
+            const tbody = document.getElementById('questionsTableBody');
+            
+            if (questions.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="4" style="text-align: center; padding: 3rem; color: var(--text-secondary);">
+                            <div style="font-size: 3rem; margin-bottom: 1rem;">❓</div>
+                            <div style="font-size: 1.125rem; font-weight: 600; margin-bottom: 0.5rem;">No questions yet</div>
+                            <div style="font-size: 0.875rem;">Add your first question to get started</div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = questions.map(q => `
+                <tr>
+                    <td style="font-size: 0.875rem;">${q.question_text.substring(0, 100)}${q.question_text.length > 100 ? '...' : ''}</td>
+                    <td><span class="badge badge-secondary">${q.category ? q.category.name : 'No category'}</span></td>
+                    <td><span style="font-weight: 700; color: var(--primary);">${q.correct_answer.toUpperCase()}</span></td>
+                    <td>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button class="btn-icon" onclick="editQuestion(${q.id})" title="Edit">✏️</button>
+                            <button class="btn-icon" onclick="deleteQuestion(${q.id})" title="Delete" style="color: var(--danger);">🗑️</button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Populate category selects
+        function populateCategorySelects() {
+            const selects = [
+                document.getElementById('questionCategorySelect'),
+                document.getElementById('questionCategoryFilter')
+            ];
+
+            selects.forEach(select => {
+                if (select && select.id === 'questionCategorySelect') {
+                    select.innerHTML = '<option value="">Select category</option>' +
+                        categories.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+                } else if (select) {
+                    select.innerHTML = '<option value="">All Categories</option>' +
+                        categories.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+                }
+            });
+        }
+
+        // Filter questions
+        function filterQuestions() {
+            const categoryId = document.getElementById('questionCategoryFilter').value;
+            const search = document.getElementById('questionSearch').value.toLowerCase();
+
+            questions = allQuestions.filter(q => {
+                const matchesCategory = !categoryId || q.category_id == categoryId;
+                const matchesSearch = !search || q.question_text.toLowerCase().includes(search);
+                return matchesCategory && matchesSearch;
+            });
+
+            renderQuestions();
+        }
+
+        // Clear filters
+        function clearFilters() {
+            document.getElementById('questionCategoryFilter').value = '';
+            document.getElementById('questionSearch').value = '';
+            questions = allQuestions;
+            renderQuestions();
+        }
+
+        // Open create modal
+        function openCreateQuestionModal() {
+            editingQuestionId = null;
+            document.getElementById('questionModalTitle').textContent = 'Add Question';
+            document.getElementById('questionSaveBtn').textContent = 'Add Question';
+            document.getElementById('questionForm').reset();
+            document.getElementById('questionModal').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Edit question
+        function editQuestion(id) {
+            const question = allQuestions.find(q => q.id === id);
+            if (!question) return;
+
+            editingQuestionId = id;
+            document.getElementById('questionModalTitle').textContent = 'Edit Question';
+            document.getElementById('questionSaveBtn').textContent = 'Update Question';
+            
+            const form = document.getElementById('questionForm');
+            form.category_id.value = question.category_id;
+            form.question_text.value = question.question_text;
+            form.option_a.value = question.option_a;
+            form.option_b.value = question.option_b;
+            form.option_c.value = question.option_c;
+            form.option_d.value = question.option_d;
+            form.correct_answer.value = question.correct_answer;
+            
+            document.getElementById('questionModal').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Save question
+        async function saveQuestion(event) {
+            event.preventDefault();
+            
+            const form = event.target;
+            const formData = new FormData(form);
+            const data = {
+                category_id: parseInt(formData.get('category_id')),
+                question_text: formData.get('question_text'),
+                option_a: formData.get('option_a'),
+                option_b: formData.get('option_b'),
+                option_c: formData.get('option_c'),
+                option_d: formData.get('option_d'),
+                correct_answer: formData.get('correct_answer'),
+            };
+
+            try {
+                const url = editingQuestionId 
+                    ? `/admin/api/questions/${editingQuestionId}`
+                    : '/admin/api/questions';
+                
+                const method = editingQuestionId ? 'PUT' : 'POST';
+
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showNotification(result.message, 'success');
+                    closeQuestionModal();
+                    loadQuestions();
+                } else {
+                    showNotification(result.message || 'Error saving question', 'error');
+                }
+            } catch (error) {
+                console.error('Error saving question:', error);
+                showNotification('Error: ' + error.message, 'error');
+            }
+        }
+
+        // Delete question
+        async function deleteQuestion(id) {
+            if (!confirm('Delete this question? This action cannot be undone.')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/admin/api/questions/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    }
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showNotification(result.message, 'success');
+                    loadQuestions();
+                } else {
+                    showNotification(result.message || 'Error deleting question', 'error');
+                }
+            } catch (error) {
+                console.error('Error deleting question:', error);
+                showNotification('Error deleting question', 'error');
+            }
+        }
+
+        // Close modal
+        function closeQuestionModal() {
+            document.getElementById('questionModal').style.display = 'none';
+            editingQuestionId = null;
+            document.body.style.overflow = '';
+        }
 
         // Show notification
         function showNotification(message, type = 'success') {
