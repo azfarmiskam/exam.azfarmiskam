@@ -64,6 +64,12 @@ Route::middleware('auth')->prefix('admin/api')->name('admin.api.')->group(functi
             'message' => 'Question removed successfully'
         ]);
     })->name('classrooms.questions.destroy');
+    
+    // Categories
+    Route::apiResource('categories', \App\Http\Controllers\Admin\CategoryController::class);
+    
+    // Questions
+    Route::apiResource('questions', \App\Http\Controllers\Admin\QuestionController::class);
 });
 
 
