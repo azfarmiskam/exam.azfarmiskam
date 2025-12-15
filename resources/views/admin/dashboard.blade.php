@@ -12,7 +12,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
     <!-- Styles -->
-    @vite(['resources/css/app.css', 'resources/css/admin.css'])
+    @vite(['resources/css/app.css', 'resources/css/admin.css', 'resources/css/toast.css'])
 </head>
 <body>
     <div class="dashboard-layout">
@@ -327,6 +327,9 @@
             </div>
         </main>
     </div>
+
+    <!-- Toast Notifications Container -->
+    <div class="toast-container" id="toastContainer"></div>
 
     <!-- Modals -->
     <!-- Create/Edit Classroom Modal -->
@@ -748,8 +751,44 @@
 
         // Show notification
         function showNotification(message, type = 'success') {
-            // Simple alert for now - can be enhanced with a toast notification system
-            alert(message);
+            const container = document.getElementById('toastContainer');
+            
+            // Create toast element
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            
+            // Icon based on type
+            const icons = {
+                success: '✓',
+                error: '✕',
+                warning: '⚠',
+                info: 'ℹ'
+            };
+            
+            // Titles based on type
+            const titles = {
+                success: 'Success',
+                error: 'Error',
+                warning: 'Warning',
+                info: 'Info'
+            };
+            
+            toast.innerHTML = `
+                <div class="toast-icon">${icons[type] || icons.info}</div>
+                <div class="toast-content">
+                    <div class="toast-title">${titles[type] || titles.info}</div>
+                    <div class="toast-message">${message}</div>
+                </div>
+                <button class="toast-close" onclick="this.parentElement.remove()">×</button>
+            `;
+            
+            container.appendChild(toast);
+            
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                toast.classList.add('hiding');
+                setTimeout(() => toast.remove(), 300);
+            }, 5000);
         }
 
         // Load classrooms when navigating to classrooms page
