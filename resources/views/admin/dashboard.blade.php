@@ -568,6 +568,7 @@
                     </td>
                     <td>
                         <div style="display: flex; gap: 0.5rem;">
+                            <button class="btn-icon" onclick="viewClassroom(${classroom.id})" title="View Details">👁️</button>
                             <button class="btn-icon" onclick="editClassroom(${classroom.id})" title="Edit">✏️</button>
                             <button class="btn-icon" onclick="deleteClassroom(${classroom.id})" title="Delete" style="color: var(--danger);">🗑️</button>
                         </div>
@@ -608,6 +609,102 @@
             
             document.getElementById('classroomModal').style.display = 'flex';
             document.body.style.overflow = 'hidden'; // Prevent background scroll
+        }
+
+        // View classroom details
+        function viewClassroom(id) {
+            const classroom = classrooms.find(c => c.id === id);
+            if (!classroom) return;
+
+            const details = `
+                <div style="padding: 1.5rem;">
+                    <h2 style="margin: 0 0 1.5rem 0; font-size: 1.5rem; color: var(--text-primary);">${classroom.name}</h2>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-bottom: 1.5rem;">
+                        <div style="padding: 1rem; background: var(--bg-light); border-radius: 8px;">
+                            <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.25rem;">Classroom Code</div>
+                            <div style="font-size: 1.5rem; font-weight: 700; color: var(--primary); font-family: monospace;">${classroom.code}</div>
+                        </div>
+                        <div style="padding: 1rem; background: var(--bg-light); border-radius: 8px;">
+                            <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.25rem;">Status</div>
+                            <div style="font-size: 1.125rem; font-weight: 600; color: ${classroom.is_active ? 'var(--success)' : 'var(--text-secondary)'};">
+                                ${classroom.is_active ? '✓ Active' : '✗ Inactive'}
+                            </div>
+                        </div>
+                        <div style="padding: 1rem; background: var(--bg-light); border-radius: 8px;">
+                            <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.25rem;">Questions</div>
+                            <div style="font-size: 1.5rem; font-weight: 700; color: var(--text-primary);">${classroom.questions_count || 0}</div>
+                        </div>
+                        <div style="padding: 1rem; background: var(--bg-light); border-radius: 8px;">
+                            <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.25rem;">Students</div>
+                            <div style="font-size: 1.5rem; font-weight: 700; color: var(--text-primary);">${classroom.students_count || 0}</div>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 1rem;">
+                        <div style="font-size: 0.875rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.5rem;">Settings</div>
+                        <div style="display: grid; gap: 0.5rem;">
+                            <div style="display: flex; justify-content: space-between; padding: 0.5rem; background: var(--bg-light); border-radius: 6px;">
+                                <span style="font-size: 0.875rem; color: var(--text-secondary);">Questions per exam:</span>
+                                <span style="font-size: 0.875rem; font-weight: 600; color: var(--text-primary);">${classroom.questions_per_exam}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 0.5rem; background: var(--bg-light); border-radius: 6px;">
+                                <span style="font-size: 0.875rem; color: var(--text-secondary);">Timer:</span>
+                                <span style="font-size: 0.875rem; font-weight: 600; color: var(--text-primary);">${classroom.timer_minutes ? classroom.timer_minutes + ' minutes' : 'No limit'}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 0.5rem; background: var(--bg-light); border-radius: 6px;">
+                                <span style="font-size: 0.875rem; color: var(--text-secondary);">Show results immediately:</span>
+                                <span style="font-size: 0.875rem; font-weight: 600; color: var(--text-primary);">${classroom.show_results_immediately ? 'Yes' : 'No'}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 0.5rem; background: var(--bg-light); border-radius: 6px;">
+                                <span style="font-size: 0.875rem; color: var(--text-secondary);">Show correct answers:</span>
+                                <span style="font-size: 0.875rem; font-weight: 600; color: var(--text-primary);">${classroom.show_correct_answers ? 'Yes' : 'No'}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    ${classroom.description ? `
+                        <div style="margin-bottom: 1rem;">
+                            <div style="font-size: 0.875rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.5rem;">Description</div>
+                            <div style="padding: 0.75rem; background: var(--bg-light); border-radius: 6px; font-size: 0.875rem; color: var(--text-secondary);">${classroom.description}</div>
+                        </div>
+                    ` : ''}
+
+                    <div style="display: flex; gap: 0.75rem; margin-top: 1.5rem;">
+                        <button class="btn btn-primary" onclick="alert('Question management coming soon!')">Manage Questions</button>
+                        <button class="btn btn-secondary" onclick="alert('Group management coming soon!')">Manage Groups</button>
+                    </div>
+                </div>
+            `;
+
+            showNotification(`Viewing ${classroom.name}`, 'info');
+            
+            // For now, show in a simple alert-style display
+            // In production, this would be a proper modal
+            const detailsWindow = window.open('', 'Classroom Details', 'width=600,height=700');
+            detailsWindow.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>${classroom.name} - Details</title>
+                    <style>
+                        body { font-family: 'Inter', sans-serif; margin: 0; padding: 0; }
+                        :root {
+                            --primary: #3b82f6;
+                            --success: #10b981;
+                            --danger: #ef4444;
+                            --text-primary: #1e293b;
+                            --text-secondary: #64748b;
+                            --bg-light: #f1f5f9;
+                        }
+                        .btn { padding: 0.625rem 1.25rem; font-size: 0.875rem; font-weight: 600; border-radius: 8px; border: none; cursor: pointer; }
+                        .btn-primary { background: var(--primary); color: white; }
+                        .btn-secondary { background: var(--bg-light); color: var(--text-secondary); }
+                    </style>
+                </head>
+                <body>${details}</body>
+                </html>
+            `);
         }
 
         // Save classroom
