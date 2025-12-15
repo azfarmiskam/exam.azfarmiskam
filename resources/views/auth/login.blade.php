@@ -18,148 +18,175 @@
         <!-- Background Elements -->
         <div class="auth-background"></div>
         
-        <!-- Login Card -->
+        <!-- Login Container -->
         <div class="auth-container">
             <div class="auth-card">
-                <!-- Logo & Title -->
-                <div class="auth-header">
-                    <div class="auth-logo">
-                        <div class="logo-icon">📝</div>
-                        <h1>EzExam</h1>
-                    </div>
-                    <p class="auth-subtitle">Admin Portal</p>
-                </div>
-
-                <!-- Error Messages -->
-                @if($errors->any())
-                    <div class="alert alert-error">
-                        <span class="alert-icon">⚠️</span>
-                        <div class="alert-content">
-                            @foreach($errors->all() as $error)
-                                <p>{{ $error }}</p>
-                            @endforeach
-                        </div>
-                    </div>
-                @endif
-
-                @if(session('error'))
-                    <div class="alert alert-error">
-                        <span class="alert-icon">⚠️</span>
-                        <div class="alert-content">
-                            <p>{{ session('error') }}</p>
-                        </div>
-                    </div>
-                @endif
-
-                @if(session('success'))
-                    <div class="alert alert-success">
-                        <span class="alert-icon">✓</span>
-                        <div class="alert-content">
-                            <p>{{ session('success') }}</p>
-                        </div>
-                    </div>
-                @endif
-
-                <!-- Login Form -->
-                <form action="{{ route('login.post') }}" method="POST" class="auth-form" id="loginForm">
-                    @csrf
-                    
-                    <!-- Email Field -->
-                    <div class="form-group">
-                        <label for="email" class="form-label">
-                            <span class="label-icon">📧</span>
-                            Email Address
-                        </label>
-                        <input 
-                            type="email" 
-                            id="email" 
-                            name="email" 
-                            class="form-control @error('email') is-invalid @enderror" 
-                            placeholder="admin@example.com"
-                            value="{{ old('email') }}"
-                            required
-                            autofocus
-                        >
-                        @error('email')
-                            <span class="form-error">{{ $message }}</span>
-                        @enderror
-                    </div>
-
-                    <!-- Password Field -->
-                    <div class="form-group">
-                        <label for="password" class="form-label">
-                            <span class="label-icon">🔒</span>
-                            Password
-                        </label>
-                        <div class="password-input-wrapper">
-                            <input 
-                                type="password" 
-                                id="password" 
-                                name="password" 
-                                class="form-control @error('password') is-invalid @enderror" 
-                                placeholder="Enter your password"
-                                required
-                            >
-                            <button type="button" class="password-toggle" id="togglePassword">
-                                <span class="eye-icon">👁️</span>
-                            </button>
-                        </div>
-                        @error('password')
-                            <span class="form-error">{{ $message }}</span>
-                        @enderror
-                    </div>
-
-                    <!-- Math Captcha -->
-                    <div class="form-group">
-                        <label for="captcha" class="form-label">
-                            <span class="label-icon">🧮</span>
-                            Security Check
-                        </label>
-                        <div class="captcha-wrapper">
-                            <div class="captcha-question">
-                                <span class="captcha-text">What is</span>
-                                <span class="captcha-math" id="captchaQuestion">{{ session('captcha_num1', rand(1, 10)) }} + {{ session('captcha_num2', rand(1, 10)) }}</span>
-                                <span class="captcha-text">?</span>
-                                <button type="button" class="captcha-refresh" id="refreshCaptcha" title="Refresh">
-                                    🔄
-                                </button>
+                <!-- Two Column Layout -->
+                <div class="auth-grid">
+                    <!-- Left Side - Logo & Branding -->
+                    <div class="auth-brand">
+                        <div class="brand-content">
+                            <div class="brand-logo">
+                                <div class="logo-icon-large">📝</div>
+                                <h1 class="brand-title">EzExam</h1>
+                                <p class="brand-tagline">Admin Portal</p>
                             </div>
-                            <input 
-                                type="number" 
-                                id="captcha" 
-                                name="captcha" 
-                                class="form-control captcha-input @error('captcha') is-invalid @enderror" 
-                                placeholder="Answer"
-                                required
-                            >
+                            <div class="brand-features">
+                                <div class="feature-badge">
+                                    <span class="badge-icon">✓</span>
+                                    <span>Secure Login</span>
+                                </div>
+                                <div class="feature-badge">
+                                    <span class="badge-icon">✓</span>
+                                    <span>Math Captcha</span>
+                                </div>
+                                <div class="feature-badge">
+                                    <span class="badge-icon">✓</span>
+                                    <span>Activity Tracking</span>
+                                </div>
+                            </div>
                         </div>
-                        @error('captcha')
-                            <span class="form-error">{{ $message }}</span>
-                        @enderror
                     </div>
 
-                    <!-- Remember Me -->
-                    <div class="form-group">
-                        <label class="checkbox-label">
-                            <input type="checkbox" name="remember" id="remember">
-                            <span class="checkbox-custom"></span>
-                            <span class="checkbox-text">Remember me for 30 days</span>
-                        </label>
+                    <!-- Right Side - Login Form -->
+                    <div class="auth-form-section">
+                        <div class="form-header">
+                            <h2 class="form-title">Sign In</h2>
+                            <p class="form-subtitle">Enter your credentials to access the admin panel</p>
+                        </div>
+
+                        <!-- Error Messages -->
+                        @if($errors->any())
+                            <div class="alert alert-error">
+                                <span class="alert-icon">⚠️</span>
+                                <div class="alert-content">
+                                    @foreach($errors->all() as $error)
+                                        <p>{{ $error }}</p>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endif
+
+                        @if(session('error'))
+                            <div class="alert alert-error">
+                                <span class="alert-icon">⚠️</span>
+                                <div class="alert-content">
+                                    <p>{{ session('error') }}</p>
+                                </div>
+                            </div>
+                        @endif
+
+                        @if(session('success'))
+                            <div class="alert alert-success">
+                                <span class="alert-icon">✓</span>
+                                <div class="alert-content">
+                                    <p>{{ session('success') }}</p>
+                                </div>
+                            </div>
+                        @endif
+
+                        <!-- Login Form -->
+                        <form action="{{ route('login.post') }}" method="POST" class="auth-form" id="loginForm">
+                            @csrf
+                            
+                            <!-- Email Field -->
+                            <div class="form-group">
+                                <label for="email" class="form-label">
+                                    <span class="label-icon">📧</span>
+                                    Email Address
+                                </label>
+                                <input 
+                                    type="email" 
+                                    id="email" 
+                                    name="email" 
+                                    class="form-control @error('email') is-invalid @enderror" 
+                                    placeholder="admin@example.com"
+                                    value="{{ old('email') }}"
+                                    required
+                                    autofocus
+                                >
+                                @error('email')
+                                    <span class="form-error">{{ $message }}</span>
+                                @enderror
+                            </div>
+
+                            <!-- Password Field -->
+                            <div class="form-group">
+                                <label for="password" class="form-label">
+                                    <span class="label-icon">🔒</span>
+                                    Password
+                                </label>
+                                <div class="password-input-wrapper">
+                                    <input 
+                                        type="password" 
+                                        id="password" 
+                                        name="password" 
+                                        class="form-control @error('password') is-invalid @enderror" 
+                                        placeholder="Enter your password"
+                                        required
+                                    >
+                                    <button type="button" class="password-toggle" id="togglePassword">
+                                        <span class="eye-icon">👁️</span>
+                                    </button>
+                                </div>
+                                @error('password')
+                                    <span class="form-error">{{ $message }}</span>
+                                @enderror
+                            </div>
+
+                            <!-- Math Captcha -->
+                            <div class="form-group">
+                                <label for="captcha" class="form-label">
+                                    <span class="label-icon">🧮</span>
+                                    Security Check
+                                </label>
+                                <div class="captcha-wrapper">
+                                    <div class="captcha-question">
+                                        <span class="captcha-text">What is</span>
+                                        <span class="captcha-math" id="captchaQuestion">{{ session('captcha_num1', rand(1, 10)) }} + {{ session('captcha_num2', rand(1, 10)) }}</span>
+                                        <span class="captcha-text">?</span>
+                                        <button type="button" class="captcha-refresh" id="refreshCaptcha" title="Refresh">
+                                            🔄
+                                        </button>
+                                    </div>
+                                    <input 
+                                        type="number" 
+                                        id="captcha" 
+                                        name="captcha" 
+                                        class="form-control captcha-input @error('captcha') is-invalid @enderror" 
+                                        placeholder="Answer"
+                                        required
+                                    >
+                                </div>
+                                @error('captcha')
+                                    <span class="form-error">{{ $message }}</span>
+                                @enderror
+                            </div>
+
+                            <!-- Remember Me -->
+                            <div class="form-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="remember" id="remember">
+                                    <span class="checkbox-custom"></span>
+                                    <span class="checkbox-text">Remember me</span>
+                                </label>
+                            </div>
+
+                            <!-- Submit Button -->
+                            <button type="submit" class="btn btn-primary btn-block" id="submitBtn">
+                                <span class="btn-text">Sign In</span>
+                                <span class="btn-icon">→</span>
+                            </button>
+                        </form>
+
+                        <!-- Footer Links -->
+                        <div class="auth-footer">
+                            <a href="/" class="back-link">
+                                <span>←</span>
+                                <span>Back to Home</span>
+                            </a>
+                        </div>
                     </div>
-
-                    <!-- Submit Button -->
-                    <button type="submit" class="btn btn-primary btn-block" id="submitBtn">
-                        <span class="btn-text">Sign In</span>
-                        <span class="btn-icon">→</span>
-                    </button>
-                </form>
-
-                <!-- Footer Links -->
-                <div class="auth-footer">
-                    <a href="/" class="back-link">
-                        <span>←</span>
-                        <span>Back to Home</span>
-                    </a>
                 </div>
             </div>
         </div>
