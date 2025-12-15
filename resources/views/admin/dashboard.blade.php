@@ -352,10 +352,71 @@
 
                 <!-- Students Content -->
                 <div class="spa-content" id="page-students">
-                    <div class="card">
+                    <!-- Header with Add Button -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                        <div>
+                            <h2 style="margin: 0; font-size: 1.5rem; font-weight: 700;">Students</h2>
+                            <p style="margin: 0.25rem 0 0 0; color: var(--text-secondary); font-size: 0.875rem;">Manage student registrations</p>
+                        </div>
+                        <button class="btn btn-primary" onclick="openCreateStudentModal()" style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span>➕</span>
+                            <span>Add Student</span>
+                        </button>
+                    </div>
+
+                    <!-- Filters -->
+                    <div class="card" style="margin-bottom: 1.5rem;">
                         <div class="card-body">
-                            <h3>Students</h3>
-                            <p>Student management features coming soon...</p>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 1rem;">
+                                <div class="form-group" style="margin: 0;">
+                                    <label class="form-label">Classroom</label>
+                                    <select id="studentClassroomFilter" class="form-control" onchange="filterStudents()">
+                                        <option value="">All Classrooms</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" style="margin: 0;">
+                                    <label class="form-label">Group</label>
+                                    <select id="studentGroupFilter" class="form-control" onchange="filterStudents()">
+                                        <option value="">All Groups</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" style="margin: 0;">
+                                    <label class="form-label">Search</label>
+                                    <input type="text" id="studentSearch" class="form-control" placeholder="Name, email, matric..." onkeyup="filterStudents()">
+                                </div>
+                                <div style="display: flex; align-items: flex-end;">
+                                    <button class="btn btn-secondary" onclick="clearStudentFilters()">Clear</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Students Table -->
+                    <div class="card">
+                        <div class="card-body" style="padding: 0;">
+                            <div style="overflow-x: auto;">
+                                <table class="data-table" id="studentsTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Email</th>
+                                            <th>Matric Number</th>
+                                            <th>Classroom</th>
+                                            <th>Group</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="studentsTableBody">
+                                        <tr>
+                                            <td colspan="6" style="text-align: center; padding: 3rem; color: var(--text-secondary);">
+                                                <div style="font-size: 3rem; margin-bottom: 1rem;">👥</div>
+                                                <div style="font-size: 1.125rem; font-weight: 600; margin-bottom: 0.5rem;">No students yet</div>
+                                                <div style="font-size: 0.875rem;">Add your first student to get started</div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -602,6 +663,58 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" onclick="closeQuestionModal()">Cancel</button>
                     <button type="submit" class="btn btn-primary" id="questionSaveBtn">Add Question</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Student Modal -->
+    <div class="modal" id="studentModal" style="display: none;">
+        <div class="modal-overlay" onclick="closeStudentModal()"></div>
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header">
+                <h3 id="studentModalTitle">Add Student</h3>
+                <button class="modal-close" onclick="closeStudentModal()">×</button>
+            </div>
+            <form id="studentForm" onsubmit="saveStudent(event)">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="form-label">Classroom *</label>
+                        <select name="classroom_id" class="form-control" required id="studentClassroomSelect" onchange="loadGroupsForStudent(this.value)">
+                            <option value="">Select classroom</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Group</label>
+                        <select name="group_id" class="form-control" id="studentGroupSelect">
+                            <option value="">No group</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Name *</label>
+                        <input type="text" name="name" class="form-control" required placeholder="Student name">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Email *</label>
+                        <input type="email" name="email" class="form-control" required placeholder="student@example.com">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Phone</label>
+                        <input type="tel" name="phone" class="form-control" placeholder="Optional">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Matric Number</label>
+                        <input type="text" name="matric_number" class="form-control" placeholder="Optional">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeStudentModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="studentSaveBtn">Add Student</button>
                 </div>
             </form>
         </div>
@@ -1420,6 +1533,282 @@
             editingQuestionId = null;
             document.body.style.overflow = '';
         }
+
+        // ==========================================
+        // STUDENT MANAGEMENT
+        // ==========================================
+        
+        let students = [];
+        let allStudents = [];
+        let editingStudentId = null;
+        let studentGroups = [];
+
+        // Load students
+        async function loadStudents() {
+            try {
+                const response = await fetch('/admin/api/students');
+                const data = await response.json();
+                allStudents = data.students;
+                students = allStudents;
+                renderStudents();
+                populateStudentFilters();
+            } catch (error) {
+                console.error('Error loading students:', error);
+                showNotification('Error loading students', 'error');
+            }
+        }
+
+        // Render students table
+        function renderStudents() {
+            const tbody = document.getElementById('studentsTableBody');
+            
+            if (students.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" style="text-align: center; padding: 3rem; color: var(--text-secondary);">
+                            <div style="font-size: 3rem; margin-bottom: 1rem;">👥</div>
+                            <div style="font-size: 1.125rem; font-weight: 600; margin-bottom: 0.5rem;">No students yet</div>
+                            <div style="font-size: 0.875rem;">Add your first student to get started</div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = students.map(s => `
+                <tr>
+                    <td style="font-weight: 600;">${s.name}</td>
+                    <td style="font-size: 0.875rem;">${s.email}</td>
+                    <td style="font-size: 0.875rem;">${s.matric_number || '-'}</td>
+                    <td><span class="badge badge-secondary">${s.classroom ? s.classroom.name : 'No classroom'}</span></td>
+                    <td><span class="badge badge-secondary">${s.group ? s.group.name : 'No group'}</span></td>
+                    <td>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button class="btn-icon" onclick="editStudent(${s.id})" title="Edit">✏️</button>
+                            <button class="btn-icon" onclick="deleteStudent(${s.id})" title="Delete" style="color: var(--danger);">🗑️</button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Populate student filters
+        function populateStudentFilters() {
+            const classroomFilter = document.getElementById('studentClassroomFilter');
+            const classroomSelect = document.getElementById('studentClassroomSelect');
+            
+            if (classroomFilter) {
+                classroomFilter.innerHTML = '<option value="">All Classrooms</option>' +
+                    classrooms.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+            }
+            
+            if (classroomSelect) {
+                classroomSelect.innerHTML = '<option value="">Select classroom</option>' +
+                    classrooms.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+            }
+        }
+
+        // Load groups for selected classroom
+        async function loadGroupsForStudent(classroomId) {
+            const groupSelect = document.getElementById('studentGroupSelect');
+            
+            if (!classroomId) {
+                groupSelect.innerHTML = '<option value="">No group</option>';
+                return;
+            }
+
+            try {
+                const response = await fetch(`/admin/api/classrooms/${classroomId}/groups`);
+                const data = await response.json();
+                studentGroups = data.groups || [];
+                
+                groupSelect.innerHTML = '<option value="">No group</option>' +
+                    studentGroups.map(g => `<option value="${g.id}">${g.name}</option>`).join('');
+            } catch (error) {
+                console.error('Error loading groups:', error);
+            }
+        }
+
+        // Filter students
+        function filterStudents() {
+            const classroomId = document.getElementById('studentClassroomFilter').value;
+            const groupId = document.getElementById('studentGroupFilter').value;
+            const search = document.getElementById('studentSearch').value.toLowerCase();
+
+            students = allStudents.filter(s => {
+                const matchesClassroom = !classroomId || s.classroom_id == classroomId;
+                const matchesGroup = !groupId || s.group_id == groupId;
+                const matchesSearch = !search || 
+                    s.name.toLowerCase().includes(search) ||
+                    s.email.toLowerCase().includes(search) ||
+                    (s.matric_number && s.matric_number.toLowerCase().includes(search));
+                return matchesClassroom && matchesGroup && matchesSearch;
+            });
+
+            renderStudents();
+            
+            // Update group filter based on classroom
+            if (classroomId) {
+                loadGroupsForFilter(classroomId);
+            } else {
+                document.getElementById('studentGroupFilter').innerHTML = '<option value="">All Groups</option>';
+            }
+        }
+
+        // Load groups for filter
+        async function loadGroupsForFilter(classroomId) {
+            const groupFilter = document.getElementById('studentGroupFilter');
+            
+            try {
+                const response = await fetch(`/admin/api/classrooms/${classroomId}/groups`);
+                const data = await response.json();
+                const groups = data.groups || [];
+                
+                groupFilter.innerHTML = '<option value="">All Groups</option>' +
+                    groups.map(g => `<option value="${g.id}">${g.name}</option>`).join('');
+            } catch (error) {
+                console.error('Error loading groups:', error);
+            }
+        }
+
+        // Clear filters
+        function clearStudentFilters() {
+            document.getElementById('studentClassroomFilter').value = '';
+            document.getElementById('studentGroupFilter').value = '';
+            document.getElementById('studentSearch').value = '';
+            students = allStudents;
+            renderStudents();
+        }
+
+        // Open create modal
+        function openCreateStudentModal() {
+            editingStudentId = null;
+            document.getElementById('studentModalTitle').textContent = 'Add Student';
+            document.getElementById('studentSaveBtn').textContent = 'Add Student';
+            document.getElementById('studentForm').reset();
+            document.getElementById('studentModal').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Edit student
+        function editStudent(id) {
+            const student = allStudents.find(s => s.id === id);
+            if (!student) return;
+
+            editingStudentId = id;
+            document.getElementById('studentModalTitle').textContent = 'Edit Student';
+            document.getElementById('studentSaveBtn').textContent = 'Update Student';
+            
+            const form = document.getElementById('studentForm');
+            form.classroom_id.value = student.classroom_id;
+            loadGroupsForStudent(student.classroom_id);
+            setTimeout(() => {
+                form.group_id.value = student.group_id || '';
+            }, 100);
+            form.name.value = student.name;
+            form.email.value = student.email;
+            form.phone.value = student.phone || '';
+            form.matric_number.value = student.matric_number || '';
+            
+            document.getElementById('studentModal').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Save student
+        async function saveStudent(event) {
+            event.preventDefault();
+            
+            const form = event.target;
+            const formData = new FormData(form);
+            const data = {
+                classroom_id: parseInt(formData.get('classroom_id')),
+                group_id: formData.get('group_id') ? parseInt(formData.get('group_id')) : null,
+                name: formData.get('name'),
+                email: formData.get('email'),
+                phone: formData.get('phone') || null,
+                matric_number: formData.get('matric_number') || null,
+            };
+
+            try {
+                const url = editingStudentId 
+                    ? `/admin/api/students/${editingStudentId}`
+                    : '/admin/api/students';
+                
+                const method = editingStudentId ? 'PUT' : 'POST';
+
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showNotification(result.message, 'success');
+                    closeStudentModal();
+                    loadStudents();
+                } else {
+                    showNotification(result.message || 'Error saving student', 'error');
+                }
+            } catch (error) {
+                console.error('Error saving student:', error);
+                showNotification('Error: ' + error.message, 'error');
+            }
+        }
+
+        // Delete student
+        async function deleteStudent(id) {
+            if (!confirm('Delete this student? This action cannot be undone.')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/admin/api/students/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    }
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showNotification(result.message, 'success');
+                    loadStudents();
+                } else {
+                    showNotification(result.message || 'Error deleting student', 'error');
+                }
+            } catch (error) {
+                console.error('Error deleting student:', error);
+                showNotification('Error deleting student', 'error');
+            }
+        }
+
+        // Close modal
+        function closeStudentModal() {
+            document.getElementById('studentModal').style.display = 'none';
+            editingStudentId = null;
+            document.body.style.overflow = '';
+        }
+
+        // Load students when navigating to students page
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                const page = link.getAttribute('data-page');
+                if (page === 'students') {
+                    loadStudents();
+                }
+            });
+        });
 
         // Show notification
         function showNotification(message, type = 'success') {
