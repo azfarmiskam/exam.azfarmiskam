@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Auth\LoginController;
 use Illuminate\Support\Facades\Route;
 
 // Homepage - Student Exam Code Entry
@@ -7,10 +8,16 @@ Route::get('/', function () {
     return view('welcome');
 })->name('home');
 
-// Temporary Login Route (will be replaced with auth system)
-Route::get('/login', function () {
-    return view('auth.login');
-})->name('login');
+// Authentication Routes
+Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
+Route::post('/login', [LoginController::class, 'login'])->name('login.post');
+Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+Route::post('/captcha/refresh', [LoginController::class, 'refreshCaptchaAjax'])->name('captcha.refresh');
+
+// Admin Dashboard (placeholder - will be protected by auth middleware)
+Route::get('/admin/dashboard', function () {
+    return view('admin.dashboard');
+})->name('admin.dashboard')->middleware('auth');
 
 // Exam Code Verification
 Route::post('/exam/verify', function () {

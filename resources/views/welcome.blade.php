@@ -26,7 +26,7 @@
                     </a>
                     <a href="{{ route('login') }}" class="admin-login-btn">
                         <span>🔐</span>
-                        <span>Admin Login</span>
+                        <span>Login</span>
                     </a>
                 </nav>
             </div>
