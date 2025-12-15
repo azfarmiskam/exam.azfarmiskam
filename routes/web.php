@@ -70,6 +70,9 @@ Route::middleware('auth')->prefix('admin/api')->name('admin.api.')->group(functi
     
     // Questions
     Route::apiResource('questions', \App\Http\Controllers\Admin\QuestionController::class);
+    
+    // Students
+    Route::apiResource('students', \App\Http\Controllers\Admin\StudentController::class);
 });
 
 
