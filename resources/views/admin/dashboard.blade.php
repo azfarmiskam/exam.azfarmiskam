@@ -332,68 +332,76 @@
     <!-- Create/Edit Classroom Modal -->
     <div class="modal" id="classroomModal" style="display: none;">
         <div class="modal-overlay" onclick="closeClassroomModal()"></div>
-        <div class="modal-content" style="max-width: 600px;">
+        <div class="modal-content" style="max-width: 800px;">
             <div class="modal-header">
                 <h3 id="modalTitle">Create Classroom</h3>
                 <button class="modal-close" onclick="closeClassroomModal()">×</button>
             </div>
             <form id="classroomForm" onsubmit="saveClassroom(event)">
                 <div class="modal-body">
-                    <div class="form-group">
-                        <label class="form-label">Classroom Name *</label>
-                        <input type="text" name="name" class="form-control" required placeholder="e.g., Mathematics 101">
-                    </div>
+                    <div class="form-grid">
+                        <!-- Left Column -->
+                        <div class="form-column">
+                            <div class="form-group">
+                                <label class="form-label">Classroom Name *</label>
+                                <input type="text" name="name" class="form-control" required placeholder="e.g., Mathematics 101">
+                            </div>
 
-                    <div class="form-group">
-                        <label class="form-label">Description</label>
-                        <textarea name="description" class="form-control" rows="3" placeholder="Optional description"></textarea>
-                    </div>
+                            <div class="form-group">
+                                <label class="form-label">Questions Per Exam *</label>
+                                <input type="number" name="questions_per_exam" class="form-control" required min="1" value="10">
+                            </div>
 
-                    <div class="form-group">
-                        <label class="form-label">Questions Per Exam *</label>
-                        <input type="number" name="questions_per_exam" class="form-control" required min="1" value="10">
-                    </div>
+                            <div class="form-group">
+                                <label class="form-label">Timer (Minutes)</label>
+                                <input type="number" name="timer_minutes" class="form-control" min="1" placeholder="Leave empty for no timer">
+                            </div>
 
-                    <div class="form-group">
-                        <label class="form-label">Timer (Minutes)</label>
-                        <input type="number" name="timer_minutes" class="form-control" min="1" placeholder="Leave empty for no timer">
-                    </div>
+                            <div class="form-group">
+                                <label class="form-label">Description</label>
+                                <textarea name="description" class="form-control" rows="3" placeholder="Optional description"></textarea>
+                            </div>
+                        </div>
 
-                    <div class="form-group">
-                        <label class="form-label">Instructions</label>
-                        <textarea name="instructions" class="form-control" rows="3" placeholder="Exam instructions for students"></textarea>
-                    </div>
+                        <!-- Right Column -->
+                        <div class="form-column">
+                            <div class="form-group">
+                                <label class="form-label">Instructions</label>
+                                <textarea name="instructions" class="form-control" rows="3" placeholder="Exam instructions for students"></textarea>
+                            </div>
 
-                    <div class="form-group">
-                        <label class="checkbox-label">
-                            <input type="checkbox" name="show_results_immediately" checked>
-                            <span class="checkbox-custom"></span>
-                            <span class="checkbox-text">Show results immediately after submission</span>
-                        </label>
-                    </div>
+                            <div class="form-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="show_results_immediately" checked>
+                                    <span class="checkbox-custom"></span>
+                                    <span class="checkbox-text">Show results immediately</span>
+                                </label>
+                            </div>
 
-                    <div class="form-group">
-                        <label class="checkbox-label">
-                            <input type="checkbox" name="show_correct_answers">
-                            <span class="checkbox-custom"></span>
-                            <span class="checkbox-text">Show correct answers in results</span>
-                        </label>
-                    </div>
+                            <div class="form-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="show_correct_answers">
+                                    <span class="checkbox-custom"></span>
+                                    <span class="checkbox-text">Show correct answers</span>
+                                </label>
+                            </div>
 
-                    <div class="form-group">
-                        <label class="checkbox-label">
-                            <input type="checkbox" name="allow_review" checked>
-                            <span class="checkbox-custom"></span>
-                            <span class="checkbox-text">Allow students to review their answers</span>
-                        </label>
-                    </div>
+                            <div class="form-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="allow_review" checked>
+                                    <span class="checkbox-custom"></span>
+                                    <span class="checkbox-text">Allow review</span>
+                                </label>
+                            </div>
 
-                    <div class="form-group">
-                        <label class="checkbox-label">
-                            <input type="checkbox" name="is_active" checked>
-                            <span class="checkbox-custom"></span>
-                            <span class="checkbox-text">Active (students can access)</span>
-                        </label>
+                            <div class="form-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="is_active" checked>
+                                    <span class="checkbox-custom"></span>
+                                    <span class="checkbox-text">Active</span>
+                                </label>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
