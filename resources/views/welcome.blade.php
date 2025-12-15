@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Online Examination System - Enter your exam code to begin">
-    <title>Exam System - Welcome</title>
+    <title>EzExam - Welcome</title>
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -22,7 +22,7 @@
                 <nav class="homepage-nav">
                     <a href="/" class="homepage-logo">
                         <div class="logo-icon">📝</div>
-                        <span>Exam System</span>
+                        <span>EzExam</span>
                     </a>
                     <a href="{{ route('login') }}" class="admin-login-btn">
                         <span>🔐</span>
@@ -36,7 +36,7 @@
         <main class="homepage-main">
             <div class="container">
                 <div class="homepage-content">
-                    <h1 class="homepage-title">Welcome to Exam System</h1>
+                    <h1 class="homepage-title">Welcome to EzExam</h1>
                     <p class="homepage-subtitle">Enter your exam code below to start your examination</p>
 
                     <!-- Exam Code Entry Card -->
@@ -97,7 +97,7 @@
         <!-- Footer -->
         <footer class="homepage-footer">
             <div class="container">
-                <p>&copy; {{ date('Y') }} Exam System. All rights reserved.</p>
+                <p>&copy; {{ date('Y') }} EzExam. All rights reserved.</p>
             </div>
         </footer>
     </div>

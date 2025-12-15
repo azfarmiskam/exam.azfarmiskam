@@ -1,4 +1,4 @@
-# Exam System - Multiple Choice Examination Platform
+# EzExam - Multiple Choice Examination Platform
 
 A comprehensive online examination system built with Laravel 12, designed for creating and managing multiple-choice exams with real-time grading and analytics.
 
