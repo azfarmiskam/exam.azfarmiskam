@@ -615,7 +615,7 @@
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
     max-width: 500px;
     width: 100%;
-    max-height: 85vh;
+    max-height: 75vh;
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -635,7 +635,7 @@
 }
 
 .modal-header {
-    padding: 1.25rem 1.5rem;
+    padding: 1rem 1.25rem;
     border-bottom: 1px solid var(--border-color);
     display: flex;
     align-items: center;
@@ -669,7 +669,7 @@
 }
 
 .modal-body {
-    padding: 1.25rem 1.5rem;
+    padding: 1rem 1.25rem;
     overflow-y: auto;
     flex: 1;
     min-height: 0;
@@ -694,7 +694,7 @@
 }
 
 .modal-footer {
-    padding: 1.25rem 1.5rem;
+    padding: 1rem 1.25rem;
     border-top: 1px solid var(--border-color);
     display: flex;
     gap: 0.75rem;
@@ -705,13 +705,13 @@
 
 /* Form Elements */
 .form-group {
-    margin-bottom: 0.875rem;
+    margin-bottom: 0.75rem;
 }
 
 .form-label {
     display: block;
-    margin-bottom: 0.5rem;
-    font-size: 0.875rem;
+    margin-bottom: 0.375rem;
+    font-size: 0.8125rem;
     font-weight: 600;
     color: var(--text-primary);
 }
