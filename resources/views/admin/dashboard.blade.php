@@ -817,6 +817,57 @@
         </div>
     </div>
 
+    <!-- Custom Confirm Modal -->
+    <div class="modal" id="confirmModal" style="display: none;">
+        <div class="modal-overlay" onclick="closeConfirmModal(false)"></div>
+        <div class="modal-container" style="max-width: 450px;">
+            <div class="modal-header">
+                <h3 id="confirmTitle">Confirm Action</h3>
+            </div>
+            <div class="modal-body">
+                <p id="confirmMessage" style="font-size: 0.9375rem; line-height: 1.6; color: var(--text-primary);"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeConfirmModal(false)">Cancel</button>
+                <button type="button" class="btn btn-primary" id="confirmBtn" onclick="closeConfirmModal(true)">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Alert Modal -->
+    <div class="modal" id="alertModal" style="display: none;">
+        <div class="modal-overlay" onclick="closeAlertModal()"></div>
+        <div class="modal-container" style="max-width: 450px;">
+            <div class="modal-header">
+                <h3 id="alertTitle">Notice</h3>
+            </div>
+            <div class="modal-body">
+                <p id="alertMessage" style="font-size: 0.9375rem; line-height: 1.6; color: var(--text-primary);"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="closeAlertModal()" style="width: 100%;">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Prompt Modal -->
+    <div class="modal" id="promptModal" style="display: none;">
+        <div class="modal-overlay" onclick="closePromptModal(null)"></div>
+        <div class="modal-container" style="max-width: 450px;">
+            <div class="modal-header">
+                <h3 id="promptTitle">Input Required</h3>
+            </div>
+            <div class="modal-body">
+                <p id="promptMessage" style="font-size: 0.9375rem; line-height: 1.6; color: var(--text-primary); margin-bottom: 1rem;"></p>
+                <input type="text" id="promptInput" class="form-control" placeholder="Enter value">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closePromptModal(null)">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="closePromptModal(document.getElementById('promptInput').value)">OK</button>
+            </div>
+        </div>
+    </div>
+
     <!-- JavaScript -->
     <script>
         // Sidebar Toggle
@@ -912,6 +963,78 @@
             const targetLink = document.querySelector(`.nav-link[data-page="${currentPage}"]`);
             if (targetLink) {
                 targetLink.click();
+            }
+        }
+
+        // ==========================================
+        // CUSTOM MODAL SYSTEM
+        // ==========================================
+        
+        // Custom Confirm Dialog
+        let confirmResolve = null;
+        
+        function customConfirm(message, title = 'Confirm Action') {
+            return new Promise((resolve) => {
+                confirmResolve = resolve;
+                document.getElementById('confirmTitle').textContent = title;
+                document.getElementById('confirmMessage').textContent = message;
+                document.getElementById('confirmModal').style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+            });
+        }
+        
+        function closeConfirmModal(result) {
+            document.getElementById('confirmModal').style.display = 'none';
+            document.body.style.overflow = '';
+            if (confirmResolve) {
+                confirmResolve(result);
+                confirmResolve = null;
+            }
+        }
+        
+        // Custom Alert Dialog
+        let alertResolve = null;
+        
+        function customAlert(message, title = 'Notice') {
+            return new Promise((resolve) => {
+                alertResolve = resolve;
+                document.getElementById('alertTitle').textContent = title;
+                document.getElementById('alertMessage').textContent = message;
+                document.getElementById('alertModal').style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+            });
+        }
+        
+        function closeAlertModal() {
+            document.getElementById('alertModal').style.display = 'none';
+            document.body.style.overflow = '';
+            if (alertResolve) {
+                alertResolve();
+                alertResolve = null;
+            }
+        }
+        
+        // Custom Prompt Dialog
+        let promptResolve = null;
+        
+        function customPrompt(message, title = 'Input Required', defaultValue = '') {
+            return new Promise((resolve) => {
+                promptResolve = resolve;
+                document.getElementById('promptTitle').textContent = title;
+                document.getElementById('promptMessage').textContent = message;
+                document.getElementById('promptInput').value = defaultValue;
+                document.getElementById('promptModal').style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+                document.getElementById('promptInput').focus();
+            });
+        }
+        
+        function closePromptModal(result) {
+            document.getElementById('promptModal').style.display = 'none';
+            document.body.style.overflow = '';
+            if (promptResolve) {
+                promptResolve(result);
+                promptResolve = null;
             }
         }
 
