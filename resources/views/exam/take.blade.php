@@ -705,6 +705,93 @@
         
         window.addEventListener('beforeunload', beforeUnloadHandler);
 
+        // ==========================================
+        // ANTI-CHEATING MEASURES
+        // ==========================================
+        
+        // Disable right-click (context menu)
+        document.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+            return false;
+        });
+
+        // Disable text selection
+        document.addEventListener('selectstart', (e) => {
+            e.preventDefault();
+            return false;
+        });
+
+        // Disable copy, cut, and paste
+        document.addEventListener('copy', (e) => {
+            e.preventDefault();
+            return false;
+        });
+
+        document.addEventListener('cut', (e) => {
+            e.preventDefault();
+            return false;
+        });
+
+        document.addEventListener('paste', (e) => {
+            e.preventDefault();
+            return false;
+        });
+
+        // Disable keyboard shortcuts for copying
+        document.addEventListener('keydown', (e) => {
+            // Ctrl+C, Ctrl+X, Ctrl+V, Ctrl+A, Ctrl+P, Ctrl+S, F12
+            if (
+                (e.ctrlKey && (e.key === 'c' || e.key === 'C')) ||  // Copy
+                (e.ctrlKey && (e.key === 'x' || e.key === 'X')) ||  // Cut
+                (e.ctrlKey && (e.key === 'v' || e.key === 'V')) ||  // Paste
+                (e.ctrlKey && (e.key === 'a' || e.key === 'A')) ||  // Select All
+                (e.ctrlKey && (e.key === 'p' || e.key === 'P')) ||  // Print
+                (e.ctrlKey && (e.key === 's' || e.key === 'S')) ||  // Save
+                (e.ctrlKey && (e.key === 'u' || e.key === 'U')) ||  // View Source
+                e.key === 'F12' ||                                   // DevTools
+                (e.ctrlKey && e.shiftKey && (e.key === 'i' || e.key === 'I')) || // DevTools
+                (e.ctrlKey && e.shiftKey && (e.key === 'j' || e.key === 'J')) || // DevTools
+                (e.ctrlKey && e.shiftKey && (e.key === 'c' || e.key === 'C'))    // DevTools
+            ) {
+                e.preventDefault();
+                return false;
+            }
+        });
+
+        // Disable drag and drop
+        document.addEventListener('dragstart', (e) => {
+            e.preventDefault();
+            return false;
+        });
+
+        // Add CSS to prevent text selection
+        const style = document.createElement('style');
+        style.textContent = `
+            body {
+                -webkit-user-select: none;
+                -moz-user-select: none;
+                -ms-user-select: none;
+                user-select: none;
+            }
+            
+            /* Allow selection only in answer buttons */
+            .answer-btn {
+                -webkit-user-select: none;
+                -moz-user-select: none;
+                -ms-user-select: none;
+                user-select: none;
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Detect if user switches tabs/windows (optional - for monitoring)
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                console.warn('Student switched tabs/windows at:', new Date().toISOString());
+                // You could log this to the server for monitoring
+            }
+        });
+
         // Load exam on page load
         loadExam();
     </script>
