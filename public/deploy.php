@@ -85,6 +85,11 @@ try {
             <input type="hidden" name="action" value="seed">
             <button type="submit" style="background:green;color:white">Run Seeders</button>
           </form>';
+
+    echo '<form method="POST" style="margin-top: 10px;">
+            <input type="hidden" name="action" value="cache">
+            <button type="submit" style="background:purple;color:white">Clear All Cache</button>
+          </form>';
           
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($_POST['action'] === 'migrate') {
@@ -102,6 +107,12 @@ try {
             $kernel->call('key:generate', ['--force' => true]);
             echo "<pre>" . $kernel->output() . "</pre>";
             echo "<p><strong>NOTE:</strong> If the key isn't automatically saved to .env, please copy the output above and manually edit your .env file.</p>";
+        }
+        elseif ($_POST['action'] === 'cache') {
+            echo "<h3>Clearing Cache...</h3>";
+            $kernel->call('optimize:clear');
+            echo "<pre>" . $kernel->output() . "</pre>";
+            echo "<p style='color:green'><strong>✓ All caches cleared successfully!</strong></p>";
         }
     }
 
