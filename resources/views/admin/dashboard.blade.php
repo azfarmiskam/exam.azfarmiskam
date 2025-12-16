@@ -1357,6 +1357,9 @@
         // Load data for specific page
         function loadPageData(page) {
             switch(page) {
+                case 'dashboard':
+                    if (typeof loadDashboardStats === 'function') loadDashboardStats();
+                    break;
                 case 'classrooms':
                     if (typeof loadClassrooms === 'function') loadClassrooms();
                     break;
@@ -2974,12 +2977,34 @@
         });
 
         // Load dashboard stats (placeholder - will be replaced with API calls)
-        function loadDashboardStats() {
-            // This will be replaced with actual API calls
-            document.getElementById('totalClassrooms').textContent = '0';
-            document.getElementById('totalQuestions').textContent = '0';
-            document.getElementById('totalStudents').textContent = '0';
-            document.getElementById('totalExams').textContent = '0';
+        async function loadDashboardStats() {
+            try {
+                // Fetch all data in parallel
+                const [classroomsRes, questionsRes, studentsRes, sessionsRes] = await Promise.all([
+                    fetch('/admin/api/classrooms'),
+                    fetch('/admin/api/questions'),
+                    fetch('/admin/api/students'),
+                    fetch('/admin/api/exam-sessions')
+                ]);
+
+                const classrooms = await classroomsRes.json();
+                const questions = await questionsRes.json();
+                const students = await studentsRes.json();
+                const sessions = await sessionsRes.json();
+
+                // Update stat cards
+                document.getElementById('totalClassrooms').textContent = classrooms.classrooms?.length || 0;
+                document.getElementById('totalQuestions').textContent = questions.questions?.length || 0;
+                document.getElementById('totalStudents').textContent = students.students?.length || 0;
+                document.getElementById('totalExams').textContent = sessions.sessions?.length || 0;
+            } catch (error) {
+                console.error('Error loading dashboard stats:', error);
+                // Keep showing 0 if there's an error
+                document.getElementById('totalClassrooms').textContent = '0';
+                document.getElementById('totalQuestions').textContent = '0';
+                document.getElementById('totalStudents').textContent = '0';
+                document.getElementById('totalExams').textContent = '0';
+            }
         }
 
         // ==========================================
