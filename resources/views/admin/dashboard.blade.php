@@ -1255,6 +1255,12 @@
                 case 'results':
                     if (typeof loadResults === 'function') loadResults();
                     break;
+                case 'analytics':
+                    if (typeof loadAnalytics === 'function') loadAnalytics();
+                    break;
+                case 'activity':
+                    if (typeof loadActivities === 'function') loadActivities();
+                    break;
             }
         }
 
