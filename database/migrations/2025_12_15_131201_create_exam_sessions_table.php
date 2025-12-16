@@ -16,11 +16,12 @@ return new class extends Migration
             $table->foreignId('student_id')->constrained()->onDelete('cascade');
             $table->foreignId('classroom_id')->constrained()->onDelete('cascade');
             $table->timestamp('started_at');
-            $table->timestamp('submitted_at')->nullable();
-            $table->integer('time_remaining')->nullable(); // in seconds
-            $table->integer('total_score')->default(0);
+            $table->timestamp('completed_at')->nullable();
+            $table->timestamp('expires_at')->nullable();
+            $table->integer('score')->nullable();
             $table->integer('total_questions')->default(0);
-            $table->enum('status', ['in_progress', 'submitted', 'expired'])->default('in_progress');
+            $table->integer('correct_answers')->default(0);
+            $table->enum('status', ['in_progress', 'completed', 'expired'])->default('in_progress');
             $table->timestamps();
         });
     }
