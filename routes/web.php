@@ -160,11 +160,3 @@ Route::post('/exam/{code}/session/{session}/submit', [\App\Http\Controllers\Exam
 
 // Exam Results
 
-// Deployment Helper Routes (Temporary)
-Route::prefix('deploy-helper')->name('deploy.')->group(function () {
-    Route::get('/', [\App\Http\Controllers\DeployController::class, 'index'])->name('index');
-    Route::post('/migrate', [\App\Http\Controllers\DeployController::class, 'migrate'])->name('migrate');
-    Route::post('/seed', [\App\Http\Controllers\DeployController::class, 'seed'])->name('seed');
-    Route::post('/clear', [\App\Http\Controllers\DeployController::class, 'clear'])->name('clear');
-});
-
