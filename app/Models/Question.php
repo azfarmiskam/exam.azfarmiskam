@@ -17,7 +17,12 @@ class Question extends Model
         'option_c',
         'option_d',
         'correct_answer',
+        'shuffle_answers',
         'created_by',
+    ];
+
+    protected $casts = [
+        'shuffle_answers' => 'boolean',
     ];
 
     public function category(): BelongsTo

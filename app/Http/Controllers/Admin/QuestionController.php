@@ -41,6 +41,7 @@ class QuestionController extends Controller
             'option_c' => 'required|string',
             'option_d' => 'required|string',
             'correct_answer' => 'required|in:a,b,c,d',
+            'shuffle_answers' => 'boolean',
         ]);
 
         // Handle image upload
@@ -79,6 +80,7 @@ class QuestionController extends Controller
             'option_c' => 'required|string',
             'option_d' => 'required|string',
             'correct_answer' => 'required|in:a,b,c,d',
+            'shuffle_answers' => 'boolean',
         ]);
 
         // Handle image upload

@@ -557,12 +557,31 @@
             }
             
             // Render options
-            const options = ['A', 'B', 'C', 'D'];
-            const optionsHtml = options.map(opt => `
+            let optionKeys = ['A', 'B', 'C', 'D'];
+            
+            // Check if shuffling is needed
+            if (question.shuffle_answers) {
+                if (!window.shuffledOrders) window.shuffledOrders = {};
+                
+                if (!window.shuffledOrders[question.id]) {
+                    // Create a copy and shuffle it
+                    const shuffled = [...optionKeys];
+                    for (let i = shuffled.length - 1; i > 0; i--) {
+                        const j = Math.floor(Math.random() * (i + 1));
+                        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+                    }
+                    window.shuffledOrders[question.id] = shuffled;
+                }
+                optionKeys = window.shuffledOrders[question.id];
+            }
+
+            const optionsHtml = optionKeys.map(opt => `
                 <div class="option ${answers[question.id] === opt ? 'selected' : ''}" 
                      onclick="selectAnswer('${opt}')">
-                    <div class="option-label">${opt}</div>
-                    <div class="option-text">${question['option_' + opt.toLowerCase()]}</div>
+                    ${!question.shuffle_answers ? `<div class="option-label">${opt}</div>` : ''}
+                    <div class="option-text" ${question.shuffle_answers ? 'style="padding-left: 0.5rem;"' : ''}>
+                        ${question['option_' + opt.toLowerCase()]}
+                    </div>
                 </div>
             `).join('');
             

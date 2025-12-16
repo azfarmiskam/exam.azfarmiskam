@@ -96,10 +96,16 @@ class ExamController extends Controller
         }
 
         // Get questions for this classroom
-        $questions = $classroom->questions()
-            ->inRandomOrder()
-            ->limit($classroom->questions_per_exam)
-            ->get();
+        $query = $classroom->questions();
+        
+        if ($classroom->shuffle_questions) {
+            $query->inRandomOrder();
+        } else {
+            // Default order (e.g., by assignment time)
+            $query->orderBy('classroom_questions.created_at');
+        }
+
+        $questions = $query->limit($classroom->questions_per_exam)->get();
 
         if ($questions->count() < $classroom->questions_per_exam) {
             return back()->with('error', 'Not enough questions available for this exam.');
@@ -115,9 +121,7 @@ class ExamController extends Controller
 
         // Store question order
         $questionOrder = $questions->pluck('id')->toArray();
-        if ($classroom->shuffle_questions) {
-            shuffle($questionOrder);
-        }
+        // No need to shuffle again as DB handling or fixed order is desired
         
         session(['question_order_' . $session->id => $questionOrder]);
 

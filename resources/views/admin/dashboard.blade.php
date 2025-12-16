@@ -862,6 +862,14 @@
 
                             <div class="form-group">
                                 <label class="checkbox-label">
+                                    <input type="checkbox" name="shuffle_questions">
+                                    <span class="checkbox-custom"></span>
+                                    <span class="checkbox-text">Shuffle Questions (Random Order)</span>
+                                </label>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="checkbox-label">
                                     <input type="checkbox" name="is_active" checked>
                                     <span class="checkbox-custom"></span>
                                     <span class="checkbox-text">Active</span>
@@ -964,6 +972,14 @@
                             <label class="form-label">Option D *</label>
                             <input type="text" name="option_d" class="form-control" required>
                         </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="shuffle_answers">
+                            <span class="checkbox-custom"></span>
+                            <span class="checkbox-text">Shuffle Answers (Hide ABCD labels)</span>
+                        </label>
                     </div>
 
                     <div class="form-group">
@@ -1569,6 +1585,7 @@
             form.show_results_immediately.checked = classroom.show_results_immediately;
             form.show_correct_answers.checked = classroom.show_correct_answers;
             form.allow_review.checked = classroom.allow_review;
+            form.shuffle_questions.checked = classroom.shuffle_questions;
             form.is_active.checked = classroom.is_active;
             
             document.getElementById('classroomModal').style.display = 'flex';
@@ -1898,6 +1915,7 @@
                 show_results_immediately: formData.get('show_results_immediately') === 'on',
                 show_correct_answers: formData.get('show_correct_answers') === 'on',
                 allow_review: formData.get('allow_review') === 'on',
+                shuffle_questions: formData.get('shuffle_questions') === 'on',
                 is_active: formData.get('is_active') === 'on',
             };
 
@@ -2332,6 +2350,7 @@
             form.option_c.value = question.option_c;
             form.option_d.value = question.option_d;
             form.correct_answer.value = question.correct_answer;
+            form.shuffle_answers.checked = question.shuffle_answers || false;
             
             document.getElementById('questionModal').style.display = 'flex';
             document.body.style.overflow = 'hidden';
@@ -2351,6 +2370,7 @@
                 option_c: formData.get('option_c'),
                 option_d: formData.get('option_d'),
                 correct_answer: formData.get('correct_answer'),
+                shuffle_answers: form.shuffle_answers.checked,
             };
 
             try {
