@@ -1236,9 +1236,17 @@
         let currentClassroomId = null;
         
         function viewClassroom(id) {
+            console.log('viewClassroom called with id:', id);
+            console.log('Available classrooms:', classrooms);
+            
             const classroom = classrooms.find(c => c.id === id);
-            if (!classroom) return;
+            if (!classroom) {
+                console.error('Classroom not found:', id);
+                showNotification('Classroom not found', 'error');
+                return;
+            }
 
+            console.log('Found classroom:', classroom);
             currentClassroomId = id;
             
             const details = `
@@ -1293,10 +1301,12 @@
                 ` : ''}
             `;
 
+            console.log('Setting modal content...');
             document.getElementById('classroomDetailsTitle').textContent = classroom.name;
             document.getElementById('classroomDetailsContent').innerHTML = details;
             document.getElementById('classroomDetailsModal').style.display = 'flex';
             document.body.style.overflow = 'hidden';
+            console.log('Modal should be visible now');
         }
 
         function closeClassroomDetailsModal() {
