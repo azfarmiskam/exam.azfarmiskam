@@ -490,10 +490,65 @@
 
                 <!-- Results Content -->
                 <div class="spa-content" id="page-results">
+                    <!-- Header -->
+                    <div style="margin-bottom: 1.5rem;">
+                        <h2 style="margin: 0; font-size: 1.5rem; font-weight: 700;">Exam Results</h2>
+                        <p style="margin: 0.25rem 0 0 0; color: var(--text-secondary); font-size: 0.875rem;">View and analyze student exam performance</p>
+                    </div>
+
+                    <!-- Filters -->
+                    <div class="card" style="margin-bottom: 1.5rem;">
+                        <div class="card-body">
+                            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;">
+                                <div class="form-group" style="margin: 0;">
+                                    <label class="form-label">Classroom</label>
+                                    <select id="resultsClassroomFilter" class="form-control" onchange="filterResults()">
+                                        <option value="">All Classrooms</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" style="margin: 0;">
+                                    <label class="form-label">Status</label>
+                                    <select id="resultsStatusFilter" class="form-control" onchange="filterResults()">
+                                        <option value="">All Status</option>
+                                        <option value="completed">Completed</option>
+                                        <option value="in_progress">In Progress</option>
+                                        <option value="expired">Expired</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" style="margin: 0;">
+                                    <label class="form-label">Search Student</label>
+                                    <input type="text" id="resultsSearchInput" class="form-control" placeholder="Search by name or matric..." onkeyup="filterResults()">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Results Table -->
                     <div class="card">
                         <div class="card-body">
-                            <h3>Exam Results</h3>
-                            <p>Results viewing features coming soon...</p>
+                            <div class="table-container">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Student</th>
+                                            <th>Matric No.</th>
+                                            <th>Classroom</th>
+                                            <th>Score</th>
+                                            <th>Questions</th>
+                                            <th>Status</th>
+                                            <th>Completed At</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="resultsTableBody">
+                                        <tr>
+                                            <td colspan="8" style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+                                                Loading results...
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1070,6 +1125,9 @@
                     break;
                 case 'students':
                     if (typeof loadStudents === 'function') loadStudents();
+                    break;
+                case 'results':
+                    if (typeof loadResults === 'function') loadResults();
                     break;
             }
         }
@@ -2670,6 +2728,172 @@
             document.getElementById('totalQuestions').textContent = '0';
             document.getElementById('totalStudents').textContent = '0';
             document.getElementById('totalExams').textContent = '0';
+        }
+
+        // ==========================================
+        // RESULTS MANAGEMENT
+        // ==========================================
+        
+        let allResults = [];
+        let filteredResults = [];
+
+        async function loadResults() {
+            try {
+                const response = await fetch('/admin/api/exam-sessions');
+                const data = await response.json();
+                
+                allResults = data.sessions || [];
+                filteredResults = [...allResults];
+                
+                // Populate classroom filter
+                const classroomFilter = document.getElementById('resultsClassroomFilter');
+                const classrooms = [...new Set(allResults.map(r => r.classroom))];
+                classroomFilter.innerHTML = '<option value="">All Classrooms</option>';
+                classrooms.forEach(classroom => {
+                    if (classroom) {
+                        classroomFilter.innerHTML += `<option value="${classroom.id}">${classroom.name}</option>`;
+                    }
+                });
+                
+                renderResults();
+            } catch (error) {
+                console.error('Error loading results:', error);
+                document.getElementById('resultsTableBody').innerHTML = `
+                    <tr>
+                        <td colspan="8" style="text-align: center; padding: 2rem; color: var(--error);">
+                            Error loading results. Please try again.
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+
+        function filterResults() {
+            const classroomFilter = document.getElementById('resultsClassroomFilter').value;
+            const statusFilter = document.getElementById('resultsStatusFilter').value;
+            const searchInput = document.getElementById('resultsSearchInput').value.toLowerCase();
+
+            filteredResults = allResults.filter(result => {
+                const matchesClassroom = !classroomFilter || result.classroom?.id == classroomFilter;
+                const matchesStatus = !statusFilter || result.status === statusFilter;
+                const matchesSearch = !searchInput || 
+                    result.student?.name.toLowerCase().includes(searchInput) ||
+                    result.student?.matric_number.toLowerCase().includes(searchInput);
+
+                return matchesClassroom && matchesStatus && matchesSearch;
+            });
+
+            renderResults();
+        }
+
+        function renderResults() {
+            const tbody = document.getElementById('resultsTableBody');
+            
+            if (filteredResults.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+                            No results found
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = filteredResults.map(result => {
+                const statusColors = {
+                    'completed': 'success',
+                    'in_progress': 'warning',
+                    'expired': 'error'
+                };
+                
+                const statusColor = statusColors[result.status] || 'secondary';
+                const scoreColor = result.score >= 70 ? 'success' : result.score >= 50 ? 'warning' : 'error';
+                
+                return `
+                    <tr>
+                        <td>${result.student?.name || 'N/A'}</td>
+                        <td>${result.student?.matric_number || 'N/A'}</td>
+                        <td>${result.classroom?.name || 'N/A'}</td>
+                        <td>
+                            <span class="badge badge-${scoreColor}">
+                                ${result.score !== null ? result.score + '%' : 'N/A'}
+                            </span>
+                        </td>
+                        <td>${result.correct_answers || 0} / ${result.total_questions || 0}</td>
+                        <td>
+                            <span class="badge badge-${statusColor}">
+                                ${result.status.replace('_', ' ')}
+                            </span>
+                        </td>
+                        <td>${result.completed_at ? new Date(result.completed_at).toLocaleString() : 'In Progress'}</td>
+                        <td>
+                            ${result.status === 'completed' ? 
+                                `<button class="btn btn-sm btn-primary" onclick="viewResultDetails(${result.id})">
+                                    View Details
+                                </button>` : 
+                                '<span style="color: var(--text-secondary); font-size: 0.75rem;">Not completed</span>'
+                            }
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        async function viewResultDetails(sessionId) {
+            try {
+                const response = await fetch(`/admin/api/exam-sessions/${sessionId}`);
+                const data = await response.json();
+                
+                // Create detailed view modal
+                const detailsHtml = `
+                    <div style="margin-bottom: 1.5rem;">
+                        <h4 style="margin: 0 0 0.5rem 0;">Student: ${data.student.name}</h4>
+                        <p style="margin: 0; color: var(--text-secondary);">Matric: ${data.student.matric_number}</p>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.5rem;">
+                        <div style="padding: 1rem; background: var(--bg-light); border-radius: 8px;">
+                            <div style="font-size: 0.75rem; color: var(--text-secondary);">Score</div>
+                            <div style="font-size: 1.5rem; font-weight: 700; color: var(--primary);">${data.score}%</div>
+                        </div>
+                        <div style="padding: 1rem; background: var(--bg-light); border-radius: 8px;">
+                            <div style="font-size: 0.75rem; color: var(--text-secondary);">Correct</div>
+                            <div style="font-size: 1.5rem; font-weight: 700; color: var(--success);">${data.correct_answers}</div>
+                        </div>
+                        <div style="padding: 1rem; background: var(--bg-light); border-radius: 8px;">
+                            <div style="font-size: 0.75rem; color: var(--text-secondary);">Total</div>
+                            <div style="font-size: 1.5rem; font-weight: 700;">${data.total_questions}</div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-bottom: 1rem;">
+                        <strong>Completed:</strong> ${new Date(data.completed_at).toLocaleString()}
+                    </div>
+                    
+                    ${data.classroom.show_correct_answers ? `
+                        <h5 style="margin: 1.5rem 0 1rem 0;">Answer Details</h5>
+                        <div style="max-height: 400px; overflow-y: auto;">
+                            ${data.answers.map((answer, index) => `
+                                <div style="padding: 1rem; margin-bottom: 0.5rem; background: var(--bg-light); border-radius: 8px; border-left: 3px solid ${answer.is_correct ? 'var(--success)' : 'var(--error)'};">
+                                    <div style="font-weight: 600; margin-bottom: 0.5rem;">
+                                        Question ${index + 1}: ${answer.question.question_text}
+                                    </div>
+                                    <div style="font-size: 0.875rem; color: var(--text-secondary);">
+                                        Student Answer: <strong>${answer.answer}</strong> | 
+                                        Correct Answer: <strong>${answer.question.correct_answer}</strong>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : '<p style="color: var(--text-secondary);">Answer details are hidden for this exam.</p>'}
+                `;
+                
+                await customAlert(detailsHtml, 'Exam Result Details');
+            } catch (error) {
+                console.error('Error loading result details:', error);
+                await customAlert('Error loading result details. Please try again.', 'Error');
+            }
         }
 
         // Load stats on page load
