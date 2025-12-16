@@ -863,17 +863,60 @@ textarea.form-control {
 }
 
 /* Responsive */
-@media (max-width: 1024px) {
+/* Tablet (641px - 1024px): Auto-collapse sidebar to icon-only */
+@media (max-width: 1024px) and (min-width: 641px) {
+    .sidebar {
+        width: 70px;
+    }
+
+    .sidebar-brand {
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    .nav-text {
+        opacity: 0;
+    }
+
+    .nav-section-title {
+        opacity: 0;
+    }
+
+    .main-content {
+        margin-left: 70px;
+    }
+
+    .sidebar-toggle {
+        display: none;
+    }
+}
+
+/* Mobile (≤640px): Hide sidebar, show hamburger */
+@media (max-width: 640px) {
     .mobile-menu-btn {
         display: flex;
     }
 
     .sidebar {
         transform: translateX(-100%);
+        width: 260px;
     }
 
     .sidebar.mobile-open {
         transform: translateX(0);
+    }
+
+    .sidebar.mobile-open .sidebar-brand {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    .sidebar.mobile-open .nav-text {
+        opacity: 1;
+    }
+
+    .sidebar.mobile-open .nav-section-title {
+        opacity: 1;
     }
 
     .sidebar-overlay.active {
@@ -884,15 +927,15 @@ textarea.form-control {
         margin-left: 0;
     }
 
-    .sidebar.collapsed~.main-content {
-        margin-left: 0;
+    .top-bar {
+        padding: 1rem;
+        padding-left: 4rem;
     }
 }
 
 @media (max-width: 768px) {
     .top-bar {
         padding: 1rem;
-        padding-left: 4rem;
     }
 
     .content-area {
