@@ -555,20 +555,129 @@
 
                 <!-- Analytics Content -->
                 <div class="spa-content" id="page-analytics">
+                    <!-- Header -->
+                    <div style="margin-bottom: 1.5rem;">
+                        <h2 style="margin: 0; font-size: 1.5rem; font-weight: 700;">Analytics</h2>
+                        <p style="margin: 0.25rem 0 0 0; color: var(--text-secondary); font-size: 0.875rem;">Performance insights and statistics</p>
+                    </div>
+
+                    <!-- Stats Cards -->
+                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; margin-bottom: 2rem;">
+                        <div class="card">
+                            <div class="card-body">
+                                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+                                    <div style="font-size: 0.875rem; color: var(--text-secondary);">Total Exams</div>
+                                    <span style="font-size: 1.5rem;">📊</span>
+                                </div>
+                                <div style="font-size: 2rem; font-weight: 700; color: var(--primary);" id="analyticsTotalExams">0</div>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-body">
+                                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+                                    <div style="font-size: 0.875rem; color: var(--text-secondary);">Completed</div>
+                                    <span style="font-size: 1.5rem;">✅</span>
+                                </div>
+                                <div style="font-size: 2rem; font-weight: 700; color: var(--success);" id="analyticsCompleted">0</div>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-body">
+                                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+                                    <div style="font-size: 0.875rem; color: var(--text-secondary);">Average Score</div>
+                                    <span style="font-size: 1.5rem;">📈</span>
+                                </div>
+                                <div style="font-size: 2rem; font-weight: 700; color: var(--warning);" id="analyticsAvgScore">0%</div>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-body">
+                                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+                                    <div style="font-size: 0.875rem; color: var(--text-secondary);">Pass Rate</div>
+                                    <span style="font-size: 1.5rem;">🎯</span>
+                                </div>
+                                <div style="font-size: 2rem; font-weight: 700; color: var(--success);" id="analyticsPassRate">0%</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Performance by Classroom -->
+                    <div class="card" style="margin-bottom: 1.5rem;">
+                        <div class="card-body">
+                            <h3 style="margin: 0 0 1.5rem 0; font-size: 1.125rem; font-weight: 700;">Performance by Classroom</h3>
+                            <div class="table-container">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Classroom</th>
+                                            <th>Total Students</th>
+                                            <th>Completed</th>
+                                            <th>Average Score</th>
+                                            <th>Pass Rate</th>
+                                            <th>Highest Score</th>
+                                            <th>Lowest Score</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="analyticsClassroomTable">
+                                        <tr>
+                                            <td colspan="7" style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+                                                Loading analytics...
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Activity -->
                     <div class="card">
                         <div class="card-body">
-                            <h3>Analytics</h3>
-                            <p>Analytics features coming soon...</p>
+                            <h3 style="margin: 0 0 1.5rem 0; font-size: 1.125rem; font-weight: 700;">Recent Exam Completions</h3>
+                            <div id="analyticsRecentActivity">
+                                <p style="text-align: center; padding: 2rem; color: var(--text-secondary);">Loading recent activity...</p>
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Activity Content -->
                 <div class="spa-content" id="page-activity">
+                    <!-- Header -->
+                    <div style="margin-bottom: 1.5rem;">
+                        <h2 style="margin: 0; font-size: 1.5rem; font-weight: 700;">Activity Logs</h2>
+                        <p style="margin: 0.25rem 0 0 0; color: var(--text-secondary); font-size: 0.875rem;">Recent system activities and events</p>
+                    </div>
+
+                    <!-- Filter -->
+                    <div class="card" style="margin-bottom: 1.5rem;">
+                        <div class="card-body">
+                            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;">
+                                <div class="form-group" style="margin: 0;">
+                                    <label class="form-label">Activity Type</label>
+                                    <select id="activityTypeFilter" class="form-control" onchange="filterActivities()">
+                                        <option value="">All Activities</option>
+                                        <option value="exam_started">Exam Started</option>
+                                        <option value="exam_completed">Exam Completed</option>
+                                        <option value="student_registered">Student Registered</option>
+                                        <option value="classroom_created">Classroom Created</option>
+                                        <option value="question_added">Question Added</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" style="margin: 0;">
+                                    <label class="form-label">Search</label>
+                                    <input type="text" id="activitySearchInput" class="form-control" placeholder="Search activities..." onkeyup="filterActivities()">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Activity Timeline -->
                     <div class="card">
                         <div class="card-body">
-                            <h3>Activity Logs</h3>
-                            <p>Activity log features coming soon...</p>
+                            <div id="activityTimeline">
+                                <p style="text-align: center; padding: 2rem; color: var(--text-secondary);">Loading activities...</p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -2895,6 +3004,202 @@
                 await customAlert('Error loading result details. Please try again.', 'Error');
             }
         }
+
+        // ==========================================
+        // ANALYTICS MANAGEMENT
+        // ==========================================
+        
+        async function loadAnalytics() {
+            try {
+                // Load statistics
+                const statsResponse = await fetch('/admin/api/exam-sessions/statistics');
+                const stats = await statsResponse.json();
+                
+                document.getElementById('analyticsTotalExams').textContent = stats.total_sessions;
+                document.getElementById('analyticsCompleted').textContent = stats.completed_sessions;
+                document.getElementById('analyticsAvgScore').textContent = stats.average_score + '%';
+                document.getElementById('analyticsPassRate').textContent = stats.pass_rate + '%';
+                
+                // Load classroom performance
+                const sessionsResponse = await fetch('/admin/api/exam-sessions');
+                const sessionsData = await sessionsResponse.json();
+                
+                // Group by classroom
+                const classroomStats = {};
+                sessionsData.sessions.forEach(session => {
+                    if (!session.classroom) return;
+                    
+                    const classroomId = session.classroom.id;
+                    if (!classroomStats[classroomId]) {
+                        classroomStats[classroomId] = {
+                            name: session.classroom.name,
+                            total: 0,
+                            completed: 0,
+                            scores: [],
+                            passed: 0
+                        };
+                    }
+                    
+                    classroomStats[classroomId].total++;
+                    if (session.status === 'completed') {
+                        classroomStats[classroomId].completed++;
+                        if (session.score !== null) {
+                            classroomStats[classroomId].scores.push(session.score);
+                            if (session.score >= 50) {
+                                classroomStats[classroomId].passed++;
+                            }
+                        }
+                    }
+                });
+                
+                // Render classroom table
+                const tbody = document.getElementById('analyticsClassroomTable');
+                const classroomRows = Object.values(classroomStats).map(classroom => {
+                    const avgScore = classroom.scores.length > 0 
+                        ? (classroom.scores.reduce((a, b) => a + b, 0) / classroom.scores.length).toFixed(2)
+                        : 'N/A';
+                    const passRate = classroom.scores.length > 0
+                        ? ((classroom.passed / classroom.scores.length) * 100).toFixed(2)
+                        : 'N/A';
+                    const highest = classroom.scores.length > 0 ? Math.max(...classroom.scores) : 'N/A';
+                    const lowest = classroom.scores.length > 0 ? Math.min(...classroom.scores) : 'N/A';
+                    
+                    return `
+                        <tr>
+                            <td>${classroom.name}</td>
+                            <td>${classroom.total}</td>
+                            <td>${classroom.completed}</td>
+                            <td><span class="badge badge-${avgScore >= 70 ? 'success' : avgScore >= 50 ? 'warning' : 'error'}">${avgScore}${avgScore !== 'N/A' ? '%' : ''}</span></td>
+                            <td><span class="badge badge-success">${passRate}${passRate !== 'N/A' ? '%' : ''}</span></td>
+                            <td>${highest}${highest !== 'N/A' ? '%' : ''}</td>
+                            <td>${lowest}${lowest !== 'N/A' ? '%' : ''}</td>
+                        </tr>
+                    `;
+                }).join('');
+                
+                tbody.innerHTML = classroomRows || '<tr><td colspan="7" style="text-align: center; padding: 2rem; color: var(--text-secondary);">No data available</td></tr>';
+                
+                // Load recent completions
+                const recentCompletions = sessionsData.sessions
+                    .filter(s => s.status === 'completed')
+                    .sort((a, b) => new Date(b.completed_at) - new Date(a.completed_at))
+                    .slice(0, 10);
+                
+                const activityHtml = recentCompletions.map(session => `
+                    <div style="padding: 1rem; border-left: 3px solid var(--success); background: var(--bg-light); margin-bottom: 0.75rem; border-radius: 4px;">
+                        <div style="display: flex; justify-content: space-between; align-items: start;">
+                            <div>
+                                <div style="font-weight: 600; margin-bottom: 0.25rem;">${session.student?.name || 'Unknown'} completed ${session.classroom?.name || 'exam'}</div>
+                                <div style="font-size: 0.875rem; color: var(--text-secondary);">
+                                    Score: <strong>${session.score}%</strong> | ${new Date(session.completed_at).toLocaleString()}
+                                </div>
+                            </div>
+                            <span class="badge badge-${session.score >= 70 ? 'success' : session.score >= 50 ? 'warning' : 'error'}">${session.score}%</span>
+                        </div>
+                    </div>
+                `).join('');
+                
+                document.getElementById('analyticsRecentActivity').innerHTML = activityHtml || '<p style="text-align: center; padding: 2rem; color: var(--text-secondary);">No recent activity</p>';
+                
+            } catch (error) {
+                console.error('Error loading analytics:', error);
+            }
+        }
+
+        // ==========================================
+        // ACTIVITY LOGS MANAGEMENT
+        // ==========================================
+        
+        let allActivities = [];
+        let filteredActivities = [];
+
+        async function loadActivities() {
+            try {
+                // Load exam sessions as activities
+                const response = await fetch('/admin/api/exam-sessions');
+                const data = await response.json();
+                
+                // Convert sessions to activities
+                allActivities = data.sessions.map(session => {
+                    let type, description, icon;
+                    
+                    if (session.status === 'completed') {
+                        type = 'exam_completed';
+                        description = `${session.student?.name} completed ${session.classroom?.name} with ${session.score}%`;
+                        icon = '✅';
+                    } else if (session.status === 'in_progress') {
+                        type = 'exam_started';
+                        description = `${session.student?.name} started ${session.classroom?.name}`;
+                        icon = '📝';
+                    } else {
+                        type = 'exam_expired';
+                        description = `${session.student?.name}'s exam expired for ${session.classroom?.name}`;
+                        icon = '⏰';
+                    }
+                    
+                    return {
+                        type,
+                        description,
+                        icon,
+                        timestamp: session.completed_at || session.started_at || session.created_at,
+                        data: session
+                    };
+                }).sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+                
+                filteredActivities = [...allActivities];
+                renderActivities();
+            } catch (error) {
+                console.error('Error loading activities:', error);
+                document.getElementById('activityTimeline').innerHTML = '<p style="text-align: center; padding: 2rem; color: var(--error);">Error loading activities</p>';
+            }
+        }
+
+        function filterActivities() {
+            const typeFilter = document.getElementById('activityTypeFilter').value;
+            const searchInput = document.getElementById('activitySearchInput').value.toLowerCase();
+
+            filteredActivities = allActivities.filter(activity => {
+                const matchesType = !typeFilter || activity.type === typeFilter;
+                const matchesSearch = !searchInput || activity.description.toLowerCase().includes(searchInput);
+                return matchesType && matchesSearch;
+            });
+
+            renderActivities();
+        }
+
+        function renderActivities() {
+            const timeline = document.getElementById('activityTimeline');
+            
+            if (filteredActivities.length === 0) {
+                timeline.innerHTML = '<p style="text-align: center; padding: 2rem; color: var(--text-secondary);">No activities found</p>';
+                return;
+            }
+
+            const activitiesHtml = filteredActivities.map(activity => `
+                <div style="display: flex; gap: 1rem; padding: 1rem 0; border-bottom: 1px solid var(--border-color);">
+                    <div style="flex-shrink: 0; width: 40px; height: 40px; border-radius: 50%; background: var(--bg-light); display: flex; align-items: center; justify-content: center; font-size: 1.25rem;">
+                        ${activity.icon}
+                    </div>
+                    <div style="flex: 1;">
+                        <div style="font-weight: 500; margin-bottom: 0.25rem;">${activity.description}</div>
+                        <div style="font-size: 0.875rem; color: var(--text-secondary);">${new Date(activity.timestamp).toLocaleString()}</div>
+                    </div>
+                </div>
+            `).join('');
+
+            timeline.innerHTML = activitiesHtml;
+        }
+
+        // Update loadPageData to include analytics and activity
+        const originalLoadPageData = loadPageData;
+        loadPageData = function(page) {
+            originalLoadPageData(page);
+            if (page === 'analytics') {
+                loadAnalytics();
+            } else if (page === 'activity') {
+                loadActivities();
+            }
+        };
 
         // Load stats on page load
         loadDashboardStats();
