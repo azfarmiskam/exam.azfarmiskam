@@ -55,15 +55,33 @@ try {
     
     // If we got here, we can show the original UI
     echo "<hr><h2>Deployment Tools</h2>";
-    echo '<form method="POST">
-            <input type="hidden" name="action" value="migrate">
-            <button type="submit">Run Migrations</button>
+    echo '<form method="POST" style="margin-top: 10px;">
+            <input type="hidden" name="action" value="key">
+            <button type="submit" style="background:orange">Run Key Generate</button>
+          </form>';
+
+    echo '<form method="POST" style="margin-top: 10px;">
+            <input type="hidden" name="action" value="seed">
+            <button type="submit" style="background:green;color:white">Run Seeders</button>
           </form>';
           
-    if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] === 'migrate') {
-        echo "<h3>Running Migrations...</h3>";
-        $kernel->call('migrate', ['--force' => true]);
-        echo "<pre>" . $kernel->output() . "</pre>";
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        if ($_POST['action'] === 'migrate') {
+            echo "<h3>Running Migrations...</h3>";
+            $kernel->call('migrate', ['--force' => true]);
+            echo "<pre>" . $kernel->output() . "</pre>";
+        }
+        elseif ($_POST['action'] === 'seed') {
+            echo "<h3>Running Seeders...</h3>";
+            $kernel->call('db:seed', ['--force' => true]);
+            echo "<pre>" . $kernel->output() . "</pre>";
+        }
+        elseif ($_POST['action'] === 'key') {
+            echo "<h3>Generating Key...</h3>";
+            $kernel->call('key:generate', ['--force' => true]);
+            echo "<pre>" . $kernel->output() . "</pre>";
+            echo "<p><strong>NOTE:</strong> If the key isn't automatically saved to .env, please copy the output above and manually edit your .env file.</p>";
+        }
     }
 
 } catch (Throwable $e) {
