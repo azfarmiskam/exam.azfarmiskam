@@ -1053,13 +1053,39 @@
             });
         });
 
-        // Restore current page
+        // Load data for specific page
+        function loadPageData(page) {
+            switch(page) {
+                case 'classrooms':
+                    if (typeof loadClassrooms === 'function') loadClassrooms();
+                    break;
+                case 'questions':
+                    if (typeof loadQuestions === 'function') loadQuestions();
+                    break;
+                case 'categories':
+                    if (typeof loadCategories === 'function') loadCategories();
+                    break;
+                case 'groups':
+                    if (typeof loadGroups === 'function') loadGroups();
+                    break;
+                case 'students':
+                    if (typeof loadStudents === 'function') loadStudents();
+                    break;
+            }
+        }
+
+        // Restore current page and load its data
         const currentPage = localStorage.getItem('currentPage');
         if (currentPage) {
             const targetLink = document.querySelector(`.nav-link[data-page="${currentPage}"]`);
             if (targetLink) {
                 targetLink.click();
+                // Load data after a short delay to ensure page is shown
+                setTimeout(() => loadPageData(currentPage), 100);
             }
+        } else {
+            // Load dashboard data by default
+            loadPageData('dashboard');
         }
 
         // ==========================================
