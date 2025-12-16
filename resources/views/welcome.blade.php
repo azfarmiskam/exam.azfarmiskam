@@ -24,10 +24,17 @@
                         <div class="logo-icon">📝</div>
                         <span>EzExam</span>
                     </a>
-                    <a href="{{ route('login') }}" class="admin-login-btn">
-                        <span>🔐</span>
-                        <span>Login</span>
-                    </a>
+                    @auth
+                        <a href="{{ route('admin.dashboard') }}" class="admin-login-btn">
+                            <span>📊</span>
+                            <span>Dashboard</span>
+                        </a>
+                    @else
+                        <a href="{{ route('login') }}" class="admin-login-btn">
+                            <span>🔐</span>
+                            <span>Login</span>
+                        </a>
+                    @endauth
                 </nav>
             </div>
         </header>
