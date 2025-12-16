@@ -1,6 +1,6 @@
-# Force PHP 8.4
-# Force PHP 8.4
-AddHandler application/x-httpd-php84 .php
+<FilesMatch "\.php$">
+    SetHandler x-httpd-php84
+</FilesMatch>
 
 
 <IfModule mod_rewrite.c>
