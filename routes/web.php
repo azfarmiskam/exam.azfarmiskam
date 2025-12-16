@@ -93,11 +93,25 @@ Route::post('/exam/verify', function () {
     return redirect()->route('exam.register', ['code' => $code]);
 })->name('exam.verify');
 
-// Student Registration (placeholder for now)
+// Student Registration
 Route::get('/exam/{code}/register', function ($code) {
     $classroom = \App\Models\Classroom::where('code', $code)
         ->where('is_active', true)
+        ->with('groups')
         ->firstOrFail();
     
     return view('exam.register', compact('classroom'));
 })->name('exam.register');
+
+Route::post('/exam/{code}/register', [\App\Http\Controllers\ExamController::class, 'registerSubmit'])->name('exam.register.submit');
+
+// Exam Instructions
+Route::get('/exam/{code}/instructions', [\App\Http\Controllers\ExamController::class, 'instructions'])->name('exam.instructions');
+
+// Start Exam
+Route::post('/exam/{code}/start', [\App\Http\Controllers\ExamController::class, 'start'])->name('exam.start');
+
+// Take Exam (placeholder for now)
+Route::get('/exam/{code}/take/{session}', function ($code, $session) {
+    return view('exam.take', compact('code', 'session'));
+})->name('exam.take');
