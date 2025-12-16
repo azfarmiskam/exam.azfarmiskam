@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>Taking Exam - EzExam</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    @vite(['resources/css/app.css'])
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f7fafc;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .exam-header {
+            background: white;
+            border-bottom: 2px solid #e2e8f0;
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .exam-title {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: #2d3748;
+        }
+
+        .timer {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: #fff5f5;
+            border-radius: 0.5rem;
+            border: 2px solid #feb2b2;
+        }
+
+        .timer.warning {
+            background: #fffaf0;
+            border-color: #fbd38d;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+
+        .timer-icon {
+            font-size: 1.25rem;
+        }
+
+        .timer-text {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: #742a2a;
+        }
+
+        /* Main Container */
+        .exam-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 1.5rem;
+        }
+
+        /* Question Area */
+        .question-area {
+            background: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .question-header {
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .question-number {
+            font-size: 0.875rem;
+            color: #718096;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .question-text {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #2d3748;
+            line-height: 1.6;
+        }
+
+        .question-image {
+            margin: 1.5rem 0;
+            text-align: center;
+        }
+
+        .question-image img {
+            max-width: 100%;
+            max-height: 400px;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .option {
+            padding: 1.25rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .option:hover {
+            border-color: #cbd5e0;
+            background: #f7fafc;
+        }
+
+        .option.selected {
+            border-color: #667eea;
+            background: #eef2ff;
+        }
+
+        .option-label {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: #4a5568;
+            flex-shrink: 0;
+        }
+
+        .option.selected .option-label {
+            background: #667eea;
+            color: white;
+        }
+
+        .option-text {
+            flex: 1;
+            font-size: 0.9375rem;
+            color: #2d3748;
+        }
+
+        /* Navigation */
+        .question-nav {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 2px solid #e2e8f0;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            font-size: 0.9375rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+        }
+
+        .btn-secondary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(102, 126, 234, 0.3);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: sticky;
+            top: 90px;
+            height: fit-content;
+        }
+
+        .progress-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            margin-bottom: 1.5rem;
+        }
+
+        .progress-card h3 {
+            font-size: 0.9375rem;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 1rem;
+        }
+
+        .progress-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .stat {
+            text-align: center;
+            padding: 0.75rem;
+            background: #f7fafc;
+            border-radius: 0.5rem;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: #718096;
+            margin-top: 0.25rem;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s ease;
+        }
+
+        /* Question Grid */
+        .question-grid {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .question-grid h3 {
+            font-size: 0.9375rem;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 1rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 0.5rem;
+        }
+
+        .grid-item {
+            aspect-ratio: 1;
+            border: 2px solid #e2e8f0;
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .grid-item:hover {
+            border-color: #cbd5e0;
+        }
+
+        .grid-item.answered {
+            background: #d1fae5;
+            border-color: #6ee7b7;
+            color: #065f46;
+        }
+
+        .grid-item.current {
+            background: #667eea;
+            border-color: #667eea;
+            color: white;
+        }
+
+        .submit-btn {
+            width: 100%;
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background: linear-gradient(135deg, #f56565 0%, #c53030 100%);
+            color: white;
+            font-size: 1rem;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(245, 101, 101, 0.3);
+        }
+
+        @media (max-width: 1024px) {
+            .exam-container {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                position: static;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .exam-header {
+                padding: 1rem;
+            }
+
+            .header-content {
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+
+            .question-area {
+                padding: 1.5rem;
+            }
+
+            .grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="exam-header">
+        <div class="header-content">
+            <div class="exam-title">Exam in Progress</div>
+            <div class="timer" id="timer">
+                <span class="timer-icon">⏱️</span>
+                <span class="timer-text" id="timerText">--:--</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="exam-container">
+        <!-- Question Area -->
+        <div class="question-area">
+            <div class="question-header">
+                <div class="question-number" id="questionNumber">Question 1 of 10</div>
+                <div class="question-text" id="questionText">Loading question...</div>
+            </div>
+
+            <div class="question-image" id="questionImage" style="display: none;">
+                <img src="" alt="Question Image" id="questionImg">
+            </div>
+
+            <div class="options" id="optionsContainer">
+                <!-- Options will be loaded here -->
+            </div>
+
+            <div class="question-nav">
+                <button class="btn btn-secondary" id="prevBtn" onclick="previousQuestion()">
+                    ← Previous
+                </button>
+                <button class="btn btn-primary" id="nextBtn" onclick="nextQuestion()">
+                    Next →
+                </button>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="progress-card">
+                <h3>Progress</h3>
+                <div class="progress-stats">
+                    <div class="stat">
+                        <div class="stat-value" id="answeredCount">0</div>
+                        <div class="stat-label">Answered</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value" id="remainingCount">0</div>
+                        <div class="stat-label">Remaining</div>
+                    </div>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <div class="question-grid">
+                <h3>Questions</h3>
+                <div class="grid" id="questionGrid">
+                    <!-- Grid items will be loaded here -->
+                </div>
+                <button class="btn submit-btn" onclick="submitExam()">
+                    Submit Exam
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Exam data (will be loaded from backend)
+        const sessionId = {{ $session }};
+        const code = '{{ $code }}';
+        let questions = [];
+        let answers = {};
+        let currentQuestionIndex = 0;
+        let timerInterval = null;
+
+        // Load exam data
+        async function loadExam() {
+            try {
+                const response = await fetch(`/exam/${code}/session/${sessionId}/data`);
+                const data = await response.json();
+                
+                questions = data.questions;
+                answers = data.answers || {};
+                
+                if (data.timer_minutes) {
+                    startTimer(data.expires_at);
+                }
+                
+                renderQuestionGrid();
+                loadQuestion(0);
+            } catch (error) {
+                console.error('Error loading exam:', error);
+                alert('Error loading exam. Please refresh the page.');
+            }
+        }
+
+        // Render question grid
+        function renderQuestionGrid() {
+            const grid = document.getElementById('questionGrid');
+            grid.innerHTML = questions.map((q, index) => `
+                <div class="grid-item ${index === currentQuestionIndex ? 'current' : ''} ${answers[q.id] ? 'answered' : ''}" 
+                     onclick="loadQuestion(${index})">
+                    ${index + 1}
+                </div>
+            `).join('');
+            
+            updateProgress();
+        }
+
+        // Load question
+        function loadQuestion(index) {
+            if (index < 0 || index >= questions.length) return;
+            
+            currentQuestionIndex = index;
+            const question = questions[index];
+            
+            document.getElementById('questionNumber').textContent = `Question ${index + 1} of ${questions.length}`;
+            document.getElementById('questionText').textContent = question.question_text;
+            
+            // Show image if exists
+            if (question.image_path) {
+                document.getElementById('questionImage').style.display = 'block';
+                document.getElementById('questionImg').src = `/storage/${question.image_path}`;
+            } else {
+                document.getElementById('questionImage').style.display = 'none';
+            }
+            
+            // Render options
+            const options = ['A', 'B', 'C', 'D'];
+            const optionsHtml = options.map(opt => `
+                <div class="option ${answers[question.id] === opt ? 'selected' : ''}" 
+                     onclick="selectAnswer('${opt}')">
+                    <div class="option-label">${opt}</div>
+                    <div class="option-text">${question['option_' + opt.toLowerCase()]}</div>
+                </div>
+            `).join('');
+            
+            document.getElementById('optionsContainer').innerHTML = optionsHtml;
+            
+            // Update navigation buttons
+            document.getElementById('prevBtn').disabled = index === 0;
+            document.getElementById('nextBtn').textContent = index === questions.length - 1 ? 'Finish' : 'Next →';
+            
+            renderQuestionGrid();
+        }
+
+        // Select answer
+        async function selectAnswer(option) {
+            const question = questions[currentQuestionIndex];
+            answers[question.id] = option;
+            
+            // Save answer to backend
+            try {
+                await fetch(`/exam/${code}/session/${sessionId}/answer`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: JSON.stringify({
+                        question_id: question.id,
+                        answer: option
+                    })
+                });
+            } catch (error) {
+                console.error('Error saving answer:', error);
+            }
+            
+            loadQuestion(currentQuestionIndex);
+        }
+
+        // Navigation
+        function previousQuestion() {
+            if (currentQuestionIndex > 0) {
+                loadQuestion(currentQuestionIndex - 1);
+            }
+        }
+
+        function nextQuestion() {
+            if (currentQuestionIndex < questions.length - 1) {
+                loadQuestion(currentQuestionIndex + 1);
+            }
+        }
+
+        // Update progress
+        function updateProgress() {
+            const answeredCount = Object.keys(answers).length;
+            const totalCount = questions.length;
+            const remainingCount = totalCount - answeredCount;
+            const progress = (answeredCount / totalCount) * 100;
+            
+            document.getElementById('answeredCount').textContent = answeredCount;
+            document.getElementById('remainingCount').textContent = remainingCount;
+            document.getElementById('progressFill').style.width = progress + '%';
+        }
+
+        // Timer
+        function startTimer(expiresAt) {
+            const endTime = new Date(expiresAt).getTime();
+            
+            timerInterval = setInterval(() => {
+                const now = new Date().getTime();
+                const distance = endTime - now;
+                
+                if (distance < 0) {
+                    clearInterval(timerInterval);
+                    submitExam();
+                    return;
+                }
+                
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                
+                document.getElementById('timerText').textContent = 
+                    `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                
+                // Warning when less than 5 minutes
+                if (minutes < 5) {
+                    document.getElementById('timer').classList.add('warning');
+                }
+            }, 1000);
+        }
+
+        // Submit exam
+        async function submitExam() {
+            if (!confirm('Are you sure you want to submit your exam? This action cannot be undone.')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/exam/${code}/session/${sessionId}/submit`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    }
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    window.location.href = result.redirect;
+                }
+            } catch (error) {
+                console.error('Error submitting exam:', error);
+                alert('Error submitting exam. Please try again.');
+            }
+        }
+
+        // Prevent page refresh
+        window.addEventListener('beforeunload', (e) => {
+            e.preventDefault();
+            e.returnValue = '';
+        });
+
+        // Load exam on page load
+        loadExam();
+    </script>
+</body>
+</html>
