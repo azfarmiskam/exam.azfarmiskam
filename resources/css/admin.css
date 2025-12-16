@@ -37,6 +37,7 @@
     align-items: center;
     justify-content: space-between;
     min-height: 70px;
+    position: relative;
 }
 
 .sidebar-brand {
@@ -83,6 +84,8 @@
     justify-content: center;
     transition: all 0.2s ease;
     flex-shrink: 0;
+    position: absolute;
+    right: 1.5rem;
 }
 
 .sidebar-toggle:hover {
@@ -91,7 +94,8 @@
 }
 
 .sidebar.collapsed .sidebar-toggle {
-    margin: 0 auto;
+    right: 50%;
+    transform: translateX(50%);
 }
 
 /* Sidebar Navigation */
@@ -904,19 +908,34 @@ textarea.form-control {
 
     .sidebar.mobile-open {
         transform: translateX(0);
+        width: 260px;
     }
 
     .sidebar.mobile-open .sidebar-brand {
-        opacity: 1;
-        pointer-events: auto;
+        opacity: 1 !important;
+        pointer-events: auto !important;
     }
 
     .sidebar.mobile-open .nav-text {
-        opacity: 1;
+        opacity: 1 !important;
     }
 
     .sidebar.mobile-open .nav-section-title {
-        opacity: 1;
+        opacity: 1 !important;
+    }
+
+    /* When mobile menu closes, reset to hidden state */
+    .sidebar:not(.mobile-open) .sidebar-brand {
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    .sidebar:not(.mobile-open) .nav-text {
+        opacity: 0;
+    }
+
+    .sidebar:not(.mobile-open) .nav-section-title {
+        opacity: 0;
     }
 
     .sidebar-overlay.active {
@@ -930,6 +949,10 @@ textarea.form-control {
     .top-bar {
         padding: 1rem;
         padding-left: 4rem;
+    }
+
+    .sidebar-toggle {
+        display: none;
     }
 }
 
