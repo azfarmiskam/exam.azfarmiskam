@@ -16,6 +16,14 @@
 </head>
 <body>
     <div class="dashboard-layout">
+        <!-- Mobile Menu Button -->
+        <button class="mobile-menu-btn" id="mobileMenuBtn">
+            ☰
+        </button>
+
+        <!-- Sidebar Overlay -->
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
         <!-- Sidebar -->
         <aside class="sidebar" id="sidebar">
             <!-- Sidebar Header -->
@@ -830,6 +838,25 @@
             toggleIcon.textContent = '▶';
         }
 
+        // Mobile Menu Toggle
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+        function openMobileMenu() {
+            sidebar.classList.add('mobile-open');
+            sidebarOverlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeMobileMenu() {
+            sidebar.classList.remove('mobile-open');
+            sidebarOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        mobileMenuBtn.addEventListener('click', openMobileMenu);
+        sidebarOverlay.addEventListener('click', closeMobileMenu);
+
         // SPA Navigation
         const navLinks = document.querySelectorAll('.nav-link[data-page]');
         const pageTitle = document.getElementById('pageTitle');
@@ -873,6 +900,9 @@
                 
                 // Save current page to localStorage
                 localStorage.setItem('currentPage', page);
+                
+                // Close mobile menu after navigation
+                closeMobileMenu();
             });
         });
 
