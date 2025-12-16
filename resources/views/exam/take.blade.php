@@ -382,7 +382,10 @@
     <!-- Header -->
     <div class="exam-header">
         <div class="header-content">
-            <div class="exam-title">Exam in Progress</div>
+            <div>
+                <div class="exam-title">{{ $classroom->name ?? 'Exam in Progress' }}</div>
+                <div style="font-size: 0.75rem; color: #718096; margin-top: 0.25rem;">Exam in Progress</div>
+            </div>
             <div class="timer" id="timer">
                 <span class="timer-icon">⏱️</span>
                 <span class="timer-text" id="timerText">--:--</span>
@@ -442,6 +445,25 @@
                     <!-- Grid items will be loaded here -->
                 </div>
                 <button class="btn submit-btn" onclick="submitExam()">
+                    Submit Exam
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Submit Confirmation Modal -->
+    <div id="submitModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(4px); z-index: 9999; align-items: center; justify-content: center;">
+        <div style="background: white; border-radius: 16px; padding: 2rem; max-width: 500px; width: 90%; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3); animation: slideUp 0.3s ease-out;">
+            <div style="text-align: center; margin-bottom: 1.5rem;">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">⚠️</div>
+                <h3 style="font-size: 1.25rem; font-weight: 700; color: #2d3748; margin: 0 0 0.5rem 0;">Submit Exam?</h3>
+                <p style="font-size: 0.9375rem; color: #718096; margin: 0;">Are you sure you want to submit your exam? This action cannot be undone.</p>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <button onclick="closeSubmitModal()" style="padding: 0.75rem 1.5rem; border: 2px solid #e2e8f0; background: white; color: #4a5568; border-radius: 0.5rem; font-weight: 600; font-size: 0.9375rem; cursor: pointer; transition: all 0.2s; font-family: 'Inter', sans-serif;">
+                    Cancel
+                </button>
+                <button onclick="confirmSubmit()" style="padding: 0.75rem 1.5rem; border: none; background: linear-gradient(135deg, #f56565 0%, #c53030 100%); color: white; border-radius: 0.5rem; font-weight: 600; font-size: 0.9375rem; cursor: pointer; transition: all 0.2s; font-family: 'Inter', sans-serif;">
                     Submit Exam
                 </button>
             </div>
@@ -620,8 +642,22 @@
         }
 
         // Submit exam
-        async function submitExam() {
-            if (!confirm('Are you sure you want to submit your exam? This action cannot be undone.')) {
+        function submitExam() {
+            // Show custom confirmation modal
+            document.getElementById('submitModal').style.display = 'flex';
+        }
+
+        function closeSubmitModal() {
+            document.getElementById('submitModal').style.display = 'none';
+        }
+
+        async function confirmSubmit() {
+            // Close modal
+            closeSubmitModal();
+            
+            // Skip submission in preview mode
+            if (isPreview) {
+                alert('This is a preview. Exam submission is disabled.');
                 return;
             }
             
