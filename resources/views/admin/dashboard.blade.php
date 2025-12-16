@@ -1302,9 +1302,28 @@
             `;
 
             console.log('Setting modal content...');
-            document.getElementById('classroomDetailsTitle').textContent = classroom.name;
-            document.getElementById('classroomDetailsContent').innerHTML = details;
-            document.getElementById('classroomDetailsModal').style.display = 'flex';
+            console.log('Details HTML length:', details.length);
+            
+            const titleElement = document.getElementById('classroomDetailsTitle');
+            const contentElement = document.getElementById('classroomDetailsContent');
+            const modalElement = document.getElementById('classroomDetailsModal');
+            
+            console.log('Title element:', titleElement);
+            console.log('Content element:', contentElement);
+            console.log('Modal element:', modalElement);
+            
+            if (!contentElement) {
+                console.error('classroomDetailsContent element not found!');
+                return;
+            }
+            
+            titleElement.textContent = classroom.name;
+            contentElement.innerHTML = details;
+            
+            console.log('Content element after setting innerHTML:', contentElement);
+            console.log('Content element children:', contentElement.children.length);
+            
+            modalElement.style.display = 'flex';
             document.body.style.overflow = 'hidden';
             console.log('Modal should be visible now');
         }
