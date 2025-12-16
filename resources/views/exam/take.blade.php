@@ -494,7 +494,20 @@
                 } else {
                     // Normal mode - fetch from API
                     const response = await fetch(`/exam/${code}/session/${sessionId}/data`);
+                    
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        console.error('API Error:', errorData);
+                        throw new Error(errorData.message || 'Failed to load exam data');
+                    }
+                    
                     data = await response.json();
+                }
+                
+                // Validate data
+                if (!data.questions || !Array.isArray(data.questions)) {
+                    console.error('Invalid data received:', data);
+                    throw new Error('Invalid exam data received from server');
                 }
                 
                 questions = data.questions;
@@ -508,7 +521,7 @@
                 loadQuestion(0);
             } catch (error) {
                 console.error('Error loading exam:', error);
-                alert('Error loading exam. Please refresh the page.');
+                alert(`Error loading exam: ${error.message}\n\nPlease refresh the page or contact support.`);
             }
         }
 
