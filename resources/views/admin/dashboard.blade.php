@@ -1032,6 +1032,23 @@
         </div>
     </div>
 
+    <!-- Exam Details Modal -->
+    <div class="modal" id="examDetailsModal" style="display: none;">
+        <div class="modal-overlay" onclick="closeExamDetailsModal()"></div>
+        <div class="modal-content" style="max-width: 900px; max-height: 90vh; overflow-y: auto;">
+            <div class="modal-header">
+                <h3>Exam Result Details</h3>
+                <button type="button" class="modal-close" onclick="closeExamDetailsModal()">×</button>
+            </div>
+            <div class="modal-body" id="examDetailsContent">
+                <!-- Content will be inserted here -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="closeExamDetailsModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Classroom Details Modal -->
     <div class="modal" id="classroomDetailsModal" style="display: none;">
         <div class="modal-overlay" onclick="closeClassroomDetailsModal()"></div>
@@ -2951,6 +2968,18 @@
             }).join('');
         }
 
+        // Exam Details Modal Functions
+        function openExamDetailsModal(htmlContent) {
+            document.getElementById('examDetailsContent').innerHTML = htmlContent;
+            document.getElementById('examDetailsModal').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeExamDetailsModal() {
+            document.getElementById('examDetailsModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
         async function viewResultDetails(sessionId) {
             try {
                 console.log('Fetching details for session:', sessionId);
@@ -2967,55 +2996,73 @@
                     throw new Error('Invalid session data received');
                 }
                 
-                // Create detailed view modal
+                // Create detailed view HTML
                 const detailsHtml = `
                     <div style="margin-bottom: 1.5rem;">
-                        <h4 style="margin: 0 0 0.5rem 0;">Student: ${data.student.name}</h4>
+                        <h4 style="margin: 0 0 0.5rem 0; font-size: 1.25rem;">Student: ${data.student.name}</h4>
                         <p style="margin: 0; color: var(--text-secondary);">Matric: ${data.student.matric_number}</p>
+                        <p style="margin: 0.25rem 0 0 0; color: var(--text-secondary);">Classroom: ${data.classroom.name}</p>
                     </div>
                     
                     <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.5rem;">
-                        <div style="padding: 1rem; background: var(--bg-light); border-radius: 8px;">
-                            <div style="font-size: 0.75rem; color: var(--text-secondary);">Score</div>
-                            <div style="font-size: 1.5rem; font-weight: 700; color: var(--primary);">${data.score}%</div>
+                        <div style="padding: 1rem; background: var(--bg-light); border-radius: 8px; text-align: center;">
+                            <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.5rem;">Score</div>
+                            <div style="font-size: 2rem; font-weight: 700; color: var(--primary);">${data.score}%</div>
                         </div>
-                        <div style="padding: 1rem; background: var(--bg-light); border-radius: 8px;">
-                            <div style="font-size: 0.75rem; color: var(--text-secondary);">Correct</div>
-                            <div style="font-size: 1.5rem; font-weight: 700; color: var(--success);">${data.correct_answers}</div>
+                        <div style="padding: 1rem; background: var(--bg-light); border-radius: 8px; text-align: center;">
+                            <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.5rem;">Correct Answers</div>
+                            <div style="font-size: 2rem; font-weight: 700; color: var(--success);">${data.correct_answers}</div>
                         </div>
-                        <div style="padding: 1rem; background: var(--bg-light); border-radius: 8px;">
-                            <div style="font-size: 0.75rem; color: var(--text-secondary);">Total</div>
-                            <div style="font-size: 1.5rem; font-weight: 700;">${data.total_questions}</div>
+                        <div style="padding: 1rem; background: var(--bg-light); border-radius: 8px; text-align: center;">
+                            <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.5rem;">Total Questions</div>
+                            <div style="font-size: 2rem; font-weight: 700; color: var(--text-primary);">${data.total_questions}</div>
                         </div>
                     </div>
                     
-                    <div style="margin-bottom: 1rem;">
-                        <strong>Completed:</strong> ${new Date(data.completed_at).toLocaleString()}
+                    <div style="padding: 1rem; background: var(--bg-light); border-radius: 8px; margin-bottom: 1.5rem;">
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;">
+                            <div>
+                                <strong>Started:</strong> ${new Date(data.started_at).toLocaleString()}
+                            </div>
+                            <div>
+                                <strong>Completed:</strong> ${new Date(data.completed_at).toLocaleString()}
+                            </div>
+                        </div>
                     </div>
                     
                     ${data.classroom.show_correct_answers && data.answers && data.answers.length > 0 ? `
-                        <h5 style="margin: 1.5rem 0 1rem 0;">Answer Details</h5>
+                        <h5 style="margin: 0 0 1rem 0; font-size: 1.125rem; font-weight: 700;">Answer Details</h5>
                         <div style="max-height: 400px; overflow-y: auto;">
                             ${data.answers.map((answer, index) => `
-                                <div style="padding: 1rem; margin-bottom: 0.5rem; background: var(--bg-light); border-radius: 8px; border-left: 3px solid ${answer.is_correct ? 'var(--success)' : 'var(--error)'};">
-                                    <div style="font-weight: 600; margin-bottom: 0.5rem;">
-                                        Question ${index + 1}: ${answer.question.question_text}
+                                <div style="padding: 1rem; margin-bottom: 0.75rem; background: var(--bg-light); border-radius: 8px; border-left: 4px solid ${answer.is_correct ? 'var(--success)' : 'var(--error)'};">
+                                    <div style="font-weight: 600; margin-bottom: 0.5rem; color: var(--text-primary);">
+                                        Question ${index + 1}
                                     </div>
-                                    <div style="font-size: 0.875rem; color: var(--text-secondary);">
-                                        Student Answer: <strong>${answer.answer}</strong> | 
-                                        Correct Answer: <strong>${answer.question.correct_answer}</strong>
+                                    <div style="margin-bottom: 0.5rem; color: var(--text-primary);">
+                                        ${answer.question.question_text}
+                                    </div>
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; font-size: 0.875rem;">
+                                        <div>
+                                            <span style="color: var(--text-secondary);">Student Answer:</span>
+                                            <strong style="color: ${answer.is_correct ? 'var(--success)' : 'var(--error)'}; margin-left: 0.25rem;">${answer.answer}</strong>
+                                        </div>
+                                        <div>
+                                            <span style="color: var(--text-secondary);">Correct Answer:</span>
+                                            <strong style="color: var(--success); margin-left: 0.25rem;">${answer.question.correct_answer}</strong>
+                                        </div>
                                     </div>
                                 </div>
                             `).join('')}
                         </div>
-                    ` : '<p style="color: var(--text-secondary);">Answer details are hidden for this exam.</p>'}
+                    ` : '<p style="text-align: center; padding: 2rem; color: var(--text-secondary); background: var(--bg-light); border-radius: 8px;">Answer details are hidden for this exam.</p>'}
                 `;
                 
-                await customAlert(detailsHtml, 'Exam Result Details');
+                openExamDetailsModal(detailsHtml);
+                
             } catch (error) {
                 console.error('Error loading result details:', error);
                 console.error('Error details:', error.message);
-                await customAlert(`Error loading result details: ${error.message}\n\nPlease try again or contact support.`, 'Error');
+                alert(`Error loading result details: ${error.message}\n\nPlease try again or contact support.`);
             }
         }
 
