@@ -116,9 +116,17 @@ Route::get('/exam/{code}/instructions', [\App\Http\Controllers\ExamController::c
 // Start Exam
 Route::post('/exam/{code}/start', [\App\Http\Controllers\ExamController::class, 'start'])->name('exam.start');
 
-// Take Exam (placeholder for now)
+// Take Exam
 Route::get('/exam/{code}/take/{session}', function ($code, $session) {
-    return view('exam.take', compact('code', 'session'));
+    $examSession = \App\Models\ExamSession::with('classroom')->findOrFail($session);
+    $classroom = $examSession->classroom;
+    
+    return view('exam.take', [
+        'code' => $code,
+        'session' => $session,
+        'classroom' => $classroom,
+        'isPreview' => false
+    ]);
 })->name('exam.take');
 
 // Exam API Routes

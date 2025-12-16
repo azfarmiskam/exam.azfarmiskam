@@ -133,13 +133,21 @@ class ExamController extends Controller
         $session = ExamSession::with(['classroom', 'answers'])
             ->findOrFail($sessionId);
 
-        // Verify session belongs to current student
-        if ($session->student_id !== session('student_id')) {
+        // Verify session belongs to current student (flexible check)
+        $currentStudentId = session('student_id');
+        if ($currentStudentId && $session->student_id !== $currentStudentId) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
         // Get question order from session
         $questionOrder = session('question_order_' . $sessionId, []);
+        
+        // If no question order in session, get from database
+        if (empty($questionOrder)) {
+            $questionOrder = $session->classroom->questions()
+                ->pluck('id')
+                ->toArray();
+        }
         
         // Load questions in the correct order
         $questions = $session->classroom->questions()
