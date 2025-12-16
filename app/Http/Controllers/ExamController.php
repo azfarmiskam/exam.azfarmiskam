@@ -130,47 +130,58 @@ class ExamController extends Controller
     // Get exam session data (for loading questions)
     public function getSessionData($code, $sessionId)
     {
-        $session = ExamSession::with(['classroom', 'answers'])
-            ->findOrFail($sessionId);
+        try {
+            $session = ExamSession::with(['classroom', 'answers'])
+                ->findOrFail($sessionId);
 
-        // Verify session belongs to current student (flexible check)
-        $currentStudentId = session('student_id');
-        if ($currentStudentId && $session->student_id !== $currentStudentId) {
-            return response()->json(['error' => 'Unauthorized'], 403);
+            // Verify session belongs to current student (flexible check)
+            $currentStudentId = session('student_id');
+            if ($currentStudentId && $session->student_id !== $currentStudentId) {
+                return response()->json(['error' => 'Unauthorized'], 403);
+            }
+
+            // Get question order from session
+            $questionOrder = session('question_order_' . $sessionId, []);
+            
+            // If no question order in session, get from database
+            if (empty($questionOrder)) {
+                $questionOrder = $session->classroom->questions()
+                    ->pluck('id')
+                    ->toArray();
+            }
+            
+            // Load questions in the correct order
+            $questions = $session->classroom->questions()
+                ->with('category')
+                ->whereIn('id', $questionOrder)
+                ->get()
+                ->sortBy(function($question) use ($questionOrder) {
+                    return array_search($question->id, $questionOrder);
+                })
+                ->values();
+
+            // Get existing answers
+            $answers = [];
+            foreach ($session->answers as $answer) {
+                $answers[$answer->question_id] = $answer->answer;
+            }
+
+            return response()->json([
+                'questions' => $questions,
+                'answers' => $answers,
+                'timer_minutes' => $session->classroom->timer_minutes,
+                'expires_at' => $session->expires_at ? $session->expires_at->toIso8601String() : null,
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Error loading exam session data: ' . $e->getMessage());
+            \Log::error($e->getTraceAsString());
+            
+            return response()->json([
+                'error' => 'Failed to load exam data',
+                'message' => $e->getMessage(),
+                'trace' => config('app.debug') ? $e->getTraceAsString() : null
+            ], 500);
         }
-
-        // Get question order from session
-        $questionOrder = session('question_order_' . $sessionId, []);
-        
-        // If no question order in session, get from database
-        if (empty($questionOrder)) {
-            $questionOrder = $session->classroom->questions()
-                ->pluck('id')
-                ->toArray();
-        }
-        
-        // Load questions in the correct order
-        $questions = $session->classroom->questions()
-            ->with('category')
-            ->whereIn('id', $questionOrder)
-            ->get()
-            ->sortBy(function($question) use ($questionOrder) {
-                return array_search($question->id, $questionOrder);
-            })
-            ->values();
-
-        // Get existing answers
-        $answers = [];
-        foreach ($session->answers as $answer) {
-            $answers[$answer->question_id] = $answer->answer;
-        }
-
-        return response()->json([
-            'questions' => $questions,
-            'answers' => $answers,
-            'timer_minutes' => $session->classroom->timer_minutes,
-            'expires_at' => $session->expires_at ? $session->expires_at->toIso8601String() : null,
-        ]);
     }
 
     // Save student answer
