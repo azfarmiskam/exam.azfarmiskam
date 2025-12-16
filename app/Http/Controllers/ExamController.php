@@ -243,7 +243,9 @@ class ExamController extends Controller
 
         foreach ($session->answers as $answer) {
             $question = $answer->question;
-            $isCorrect = $answer->answer === $question->correct_answer;
+            
+            // Case-insensitive comparison (A = a, B = b, etc.)
+            $isCorrect = strtoupper($answer->answer) === strtoupper($question->correct_answer);
             
             // Update answer with correctness
             $answer->update(['is_correct' => $isCorrect]);
