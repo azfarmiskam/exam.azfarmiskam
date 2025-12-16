@@ -1,3 +1,6 @@
+# Force PHP 8.4
+AddHandler x-httpd-php84 .php
+
 
 
 <IfModule mod_rewrite.c>
