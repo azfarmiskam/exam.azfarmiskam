@@ -79,10 +79,10 @@ Route::middleware('auth')->prefix('admin/api')->name('admin.api.')->group(functi
     // Students
     Route::apiResource('students', \App\Http\Controllers\Admin\StudentController::class);
     
-    // Exam Sessions (Results)
+    // Exam Sessions (Results) - specific routes BEFORE parameterized routes
+    Route::get('exam-sessions/statistics', [\App\Http\Controllers\Admin\ExamSessionController::class, 'statistics'])->name('exam-sessions.statistics');
     Route::get('exam-sessions', [\App\Http\Controllers\Admin\ExamSessionController::class, 'index'])->name('exam-sessions.index');
     Route::get('exam-sessions/{id}', [\App\Http\Controllers\Admin\ExamSessionController::class, 'show'])->name('exam-sessions.show');
-    Route::get('exam-sessions/statistics', [\App\Http\Controllers\Admin\ExamSessionController::class, 'statistics'])->name('exam-sessions.statistics');
 });
 
 
